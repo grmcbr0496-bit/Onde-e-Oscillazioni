@@ -2,9 +2,10 @@
    Strategia: tutti i file dell'app in cache all'installazione; poi "cache first" con aggiornamento in background.
    Una nuova versione si installa in attesa e si attiva quando l'utente tocca "Aggiorna". */
 "use strict";
-const VERSION = "of-d16f7bd8f9";
+const VERSION = "of-c72f7bbfe7";
 const PRECACHE = [
  "./",
+ "./ERRATA-APPUNTI.md",
  "./app.js",
  "./data-formule.js",
  "./data-problemi.js",

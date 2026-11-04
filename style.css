@@ -479,3 +479,13 @@ body { padding-bottom: calc(66px + env(safe-area-inset-bottom)); }
 .banner[hidden] { display: none; }
 .toastbox { bottom: calc(80px + env(safe-area-inset-bottom)); }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* le formule lunghe non allargano mai la pagina: le colonne della griglia possono restringersi,
+   e .math scorre o rimpicciolisce il carattere (fit) */
+section, .q, .fl, .opts, .three, .qa, .flinks, .dl, .review-list, .feedback, .exam, .concept { grid-template-columns: minmax(0, 1fr); }
+.opt { grid-template-columns: 26px minmax(0, 1fr); }
+.panel, .opt, .flink, .qa, .rv, .fcard, .math { min-width: 0; }
+.qhead .qch { min-width: 0; overflow-wrap: anywhere; }
+.im.im-wide { display: block; max-width: 100%; overflow-x: auto; overflow-y: hidden; padding: 3px 0; }
+.exam ol, .steps, .notes, .missions, .tree, .plist, .bars, .settings, .today, .labbox, .controls, .lab-group, .intro { grid-template-columns: minmax(0, 1fr); }
+.mission { grid-template-columns: 26px minmax(0, 1fr); }

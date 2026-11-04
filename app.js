@@ -191,12 +191,22 @@ function renderTex(el) {
     catch (e) { el.textContent = src; el.classList.add("raw"); }
   } else { el.textContent = src; el.classList.add("raw"); }
 }
-function fit(el) { el.style.fontSize = ""; let f = 1; while (el.scrollWidth > el.clientWidth + 1 && f > 0.5) { f -= 0.05; el.style.fontSize = f + "em"; } }
+function fit(el) { el.style.fontSize = ""; let f = 1; while (el.scrollWidth > el.clientWidth + 1 && f > 0.66) { f -= 0.05; el.style.fontSize = f + "em"; } }   // sotto il 65% la formula scorre di lato
+/* una formula in linea più larga della riga va su una riga sua, rimpicciolita o scorrevole */
+function fixWideInline(root) {
+  root.querySelectorAll(".im").forEach(el => {
+    if (!el.isConnected) return;
+    const host = el.parentElement && el.parentElement.closest("p, li, h3, .otext, .ro, .mt, .datatab > span, div");
+    const max = host ? host.clientWidth : 0; if (!max) return;
+    for (const b of el.querySelectorAll(".katex-html > .base")) if (b.getBoundingClientRect().width > max + 1) { el.classList.add("im-wide"); fit(el); break; }
+  });
+}
 function mathAll(root) {
   const els = root.querySelectorAll("[data-tex]"); els.forEach(renderTex);
   const blocks = root.querySelectorAll(".math");
-  requestAnimationFrame(() => blocks.forEach(fit));
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => blocks.forEach(el => el.isConnected && fit(el)));
+  const pass = () => { blocks.forEach(el => el.isConnected && fit(el)); fixWideInline(root); };
+  requestAnimationFrame(pass);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(pass);
 }
 
 /* ---------- toast e banner ---------- */
@@ -204,7 +214,7 @@ function toast(msg) {
   const box = document.getElementById("toast"), d = document.createElement("div");
   while (box.children.length >= 2) box.firstChild.remove();
   d.className = "t"; d.innerHTML = rich(msg); box.appendChild(d); mathAll(d);
-  setTimeout(() => d.remove(), 2800);
+  setTimeout(() => d.remove(), Math.min(6500, 2400 + 35 * String(msg).length));
 }
 function banner(text, label, onClick) {
   const b = document.getElementById("banner");
@@ -1384,7 +1394,9 @@ function importProgress(file) {
 }
 function applyTheme() {
   const t = S.settings.theme, root = document.documentElement;
-  if (t === "auto") root.removeAttribute("data-theme"); else root.setAttribute("data-theme", t);
+  // in automatico tolgo solo il tema che ho messo io (non quello scelto dall'ambiente che ospita la pagina)
+  if (t === "auto") { if (root.hasAttribute("data-of-theme")) { root.removeAttribute("data-theme"); root.removeAttribute("data-of-theme"); } }
+  else { root.setAttribute("data-theme", t); root.setAttribute("data-of-theme", "1"); }
   setTimeout(() => { readCols(); Wave.readColors(); if (Wave.still) Wave.draw(); if (LAB && !LAB.playing) drawLab(); drawPlots(app); }, 30);
 }
 
