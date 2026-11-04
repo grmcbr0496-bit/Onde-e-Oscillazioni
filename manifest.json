@@ -1,0 +1,25 @@
+{
+  "name": "Onde & Formule",
+  "short_name": "Onde&Formule",
+  "description": "Gioco didattico per lo scritto di Onde: formulario, laboratori, quiz, problemi da scritto e ripasso. Funziona offline.",
+  "lang": "it",
+  "dir": "ltr",
+  "id": "./",
+  "start_url": "./?src=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f3f5f8",
+  "theme_color": "#2747c9",
+  "categories": ["education"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Ripasso rapido (5 minuti)", "short_name": "Ripasso rapido", "url": "./?go=rapido", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Laboratori", "short_name": "Laboratori", "url": "./?go=labs", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Problemi da scritto", "short_name": "Problemi", "url": "./?go=problemi", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

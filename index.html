@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Onde &amp; Formule</title>
+<meta name="description" content="Gioco didattico per lo scritto di Onde: formulario, laboratori interattivi, quiz, problemi da scritto e ripasso. Funziona offline.">
+<meta name="theme-color" content="#f3f5f8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f141e" media="(prefers-color-scheme: dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Onde &amp; Formule">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<!-- KaTeX 0.16.11 (versione stabile), copiata in locale per funzionare offline -->
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top" id="top"></header>
+<main class="wrap" id="app" aria-live="polite"></main>
+<nav class="nav" id="nav" aria-label="Sezioni principali"></nav>
+<div class="toastbox" id="toast" role="status" aria-live="polite"></div>
+<div class="banner" id="banner" hidden></div>
+<noscript><p style="padding:16px">Questa app ha bisogno di JavaScript.</p></noscript>
+
+<script src="vendor/katex/katex.min.js" defer></script>
+<script src="data-formule.js" defer></script>
+<script src="data-quiz.js" defer></script>
+<script src="data-problemi.js" defer></script>
+<script src="labs.js" defer></script>
+<script src="app.js" defer></script>
+</body>
+</html>

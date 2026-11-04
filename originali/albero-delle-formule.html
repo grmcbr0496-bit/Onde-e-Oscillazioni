@@ -1,0 +1,2694 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L'albero delle formule</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&amp;family=IBM+Plex+Mono:wght@500;600&amp;family=Kalam:wght@400;700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<style>
+/* Quaderno a quadretti: inchiostro blu, evidenziatori come negli appunti, una corda vibrante che risponde alle risposte. */
+:root {
+  --paper: #f3f5f8;
+  --paper-glass: rgba(243, 245, 248, 0.9);
+  --grid: rgba(52, 92, 160, 0.09);
+  --card: #ffffff;
+  --ink: #1b2742;
+  --ink-2: #56627a;
+  --line: #d3d9e4;
+  --pen: #2747c9;
+  --pen-ink: #ffffff;
+  --good: #16824a;
+  --good-bg: #e3f5ea;
+  --bad: #c42f3e;
+  --bad-bg: #fbe6e8;
+  --hl-1: rgba(255, 226, 77, 0.78);
+  --hl-2: rgba(255, 136, 180, 0.6);
+  --hl-3: rgba(124, 222, 140, 0.66);
+  --hl-4: rgba(122, 196, 255, 0.66);
+  --hl-5: rgba(255, 172, 92, 0.66);
+  --lv0: #e8a3aa;
+  --lv1: #f2b36b;
+  --lv2: #f1d34f;
+  --lv3: #a6dc78;
+  --lv4: #5fc27c;
+  --lv5: #16824a;
+  --shadow: #1b2742;
+  --font-display: "Kalam", "Segoe Print", "Bradley Hand", cursive;
+  --font-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0f141e;
+    --paper-glass: rgba(15, 20, 30, 0.9);
+    --grid: rgba(140, 170, 235, 0.07);
+    --card: #171e2b;
+    --ink: #e6ebf5;
+    --ink-2: #9aa6bd;
+    --line: #2a3448;
+    --pen: #8ea6ff;
+    --pen-ink: #0d1322;
+    --good: #5fd08d;
+    --good-bg: rgba(95, 208, 141, 0.14);
+    --bad: #ff7d8a;
+    --bad-bg: rgba(255, 125, 138, 0.14);
+    --hl-1: rgba(255, 226, 77, 0.36);
+    --hl-2: rgba(255, 136, 180, 0.3);
+    --hl-3: rgba(124, 222, 140, 0.28);
+    --hl-4: rgba(122, 196, 255, 0.3);
+    --hl-5: rgba(255, 172, 92, 0.3);
+    --lv0: #8f4a52;
+    --lv1: #b9783b;
+    --lv2: #c3a83a;
+    --lv3: #7fae58;
+    --lv4: #4fae6d;
+    --lv5: #5fd08d;
+    --shadow: #000000;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0f141e;
+  --paper-glass: rgba(15, 20, 30, 0.9);
+  --grid: rgba(140, 170, 235, 0.07);
+  --card: #171e2b;
+  --ink: #e6ebf5;
+  --ink-2: #9aa6bd;
+  --line: #2a3448;
+  --pen: #8ea6ff;
+  --pen-ink: #0d1322;
+  --good: #5fd08d;
+  --good-bg: rgba(95, 208, 141, 0.14);
+  --bad: #ff7d8a;
+  --bad-bg: rgba(255, 125, 138, 0.14);
+  --hl-1: rgba(255, 226, 77, 0.36);
+  --hl-2: rgba(255, 136, 180, 0.3);
+  --hl-3: rgba(124, 222, 140, 0.28);
+  --hl-4: rgba(122, 196, 255, 0.3);
+  --hl-5: rgba(255, 172, 92, 0.3);
+  --lv0: #8f4a52;
+  --lv1: #b9783b;
+  --lv2: #c3a83a;
+  --lv3: #7fae58;
+  --lv4: #4fae6d;
+  --lv5: #5fd08d;
+  --shadow: #000000;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 22px 22px;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.45;
+}
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--pen); outline-offset: 2px; border-radius: 10px; }
+
+.wrap { max-width: 620px; margin: 0 auto; padding: 0 16px 56px; }
+
+/* barra in alto */
+.top {
+  position: sticky; top: 0; z-index: 10;
+  background: var(--paper-glass);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+.top-in { max-width: 620px; margin: 0 auto; padding: 10px 16px 8px; display: flex; align-items: center; gap: 12px; }
+.brand { font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; line-height: 1; flex: 1; white-space: nowrap; }
+.lvl { font-size: 0.82rem; color: var(--ink-2); text-align: right; line-height: 1.2; }
+.lvl b { color: var(--ink); font-weight: 700; }
+.streak { font-family: var(--font-mono); font-size: 0.8rem; font-weight: 600; border: 1.5px solid var(--ink); border-radius: 999px; padding: 3px 9px; white-space: nowrap; }
+.xpbar { height: 4px; background: var(--line); }
+.xpbar i { display: block; height: 100%; background: var(--pen); width: 0; transition: width .4s ease; }
+
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+h1 { font-family: var(--font-display); font-weight: 700; font-size: 2.3rem; line-height: 1.05; letter-spacing: -0.01em; }
+h2 { font-family: var(--font-display); font-weight: 700; font-size: 1.5rem; line-height: 1.15; }
+.eyebrow { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); }
+.muted { color: var(--ink-2); }
+.mark { background: linear-gradient(transparent 52%, var(--hl-1) 52%, var(--hl-1) 90%, transparent 90%); padding: 0 .12em; }
+
+section { margin-top: 30px; display: grid; gap: 14px; }
+.hero { margin-top: 22px; }
+
+/* corda */
+.wavebox { position: relative; }
+.wavebox canvas { display: block; width: 100%; height: 96px; }
+.wavebox.small canvas { height: 62px; }
+.wave-cap { font-family: var(--font-mono); font-size: 0.74rem; color: var(--ink-2); text-align: right; margin-top: -2px; }
+
+/* pulsanti */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  min-height: 50px; padding: 12px 18px;
+  border: 2px solid var(--ink); border-radius: 14px;
+  background: var(--card); color: var(--ink);
+  font-weight: 700; cursor: pointer;
+  box-shadow: 3px 3px 0 var(--shadow);
+  transition: transform .08s ease, box-shadow .08s ease;
+  text-align: center;
+}
+.btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--shadow); }
+.btn.primary { background: var(--pen); color: var(--pen-ink); }
+.btn.big { min-height: 58px; font-size: 1.1rem; width: 100%; }
+.btn.full { width: 100%; }
+.btn[disabled] { opacity: .5; cursor: default; }
+.link { background: none; border: 0; padding: 6px 2px; color: var(--ink-2); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+
+.today { display: grid; gap: 10px; }
+.today-num { font-size: 1.05rem; }
+.today-num b { font-family: var(--font-mono); font-size: 1.2rem; }
+.lampo-btn { justify-content: space-between; width: 100%; }
+.lampo-btn .lb { display: grid; text-align: left; gap: 2px; }
+.lampo-btn .lb span { font-weight: 400; font-size: .88rem; color: var(--ink-2); }
+.lampo-btn .rec { font-family: var(--font-mono); font-size: .82rem; font-weight: 600; color: var(--ink-2); }
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  min-width: 40px; min-height: 36px; padding: 4px 10px;
+  border: 1.5px solid var(--line); border-radius: 999px; background: var(--card);
+  font-family: var(--font-mono); font-size: .85rem; font-weight: 600; cursor: pointer;
+}
+.chip[aria-pressed="true"] { border-color: var(--ink); background: var(--hl-1); }
+.modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.mode {
+  display: grid; gap: 4px; align-content: start; text-align: left;
+  padding: 12px; border: 2px solid var(--ink); border-radius: 14px; background: var(--card);
+  box-shadow: 3px 3px 0 var(--shadow); cursor: pointer; min-height: 92px;
+}
+.mode:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--shadow); }
+.mode b { font-size: 1rem; }
+.mode span { font-size: .82rem; color: var(--ink-2); line-height: 1.3; }
+@media (max-width: 420px) { .modes { grid-template-columns: 1fr; } .mode { min-height: 0; } }
+
+/* albero */
+.tree { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.branch {
+  width: 100%; display: grid; grid-template-columns: 44px 1fr auto; align-items: center; gap: 12px;
+  padding: 10px 12px; text-align: left; cursor: pointer;
+  background: var(--card); border: 1.5px solid var(--line); border-radius: 14px;
+}
+.branch:hover { border-color: var(--ink-2); }
+.cn { font-family: var(--font-display); font-weight: 700; font-size: 1.5rem; text-align: center; line-height: 1; padding: 6px 0 4px; border-radius: 6px; }
+.h1c { background: var(--hl-1); } .h2c { background: var(--hl-2); } .h3c { background: var(--hl-3); } .h4c { background: var(--hl-4); } .h5c { background: var(--hl-5); }
+.cname { display: grid; gap: 6px; font-weight: 700; }
+.pct { font-family: var(--font-mono); font-weight: 600; font-size: .9rem; font-variant-numeric: tabular-nums; }
+.pips { display: flex; flex-wrap: wrap; gap: 3px; }
+.pip { width: 10px; height: 10px; border-radius: 3px; border: 1.5px solid var(--line); }
+.pip.b0 { background: var(--lv0); border-color: var(--lv0); }
+.pip.b1 { background: var(--lv1); border-color: var(--lv1); }
+.pip.b2 { background: var(--lv2); border-color: var(--lv2); }
+.pip.b3 { background: var(--lv3); border-color: var(--lv3); }
+.pip.b4 { background: var(--lv4); border-color: var(--lv4); }
+.pip.b5 { background: var(--lv5); border-color: var(--lv5); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: .78rem; color: var(--ink-2); align-items: center; }
+.legend span { display: inline-flex; align-items: center; gap: 5px; }
+
+.how p { margin: 0; color: var(--ink-2); max-width: 62ch; }
+.foot { margin-top: 34px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; font-size: .82rem; color: var(--ink-2); }
+
+/* domanda */
+.sesbar { display: flex; align-items: center; gap: 12px; margin-top: 14px; }
+.sesbar .link { padding: 8px 0; }
+.prog { flex: 1; height: 8px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.prog i { display: block; height: 100%; background: var(--pen); transition: width .3s ease; }
+.count { font-family: var(--font-mono); font-size: .85rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.q { display: grid; gap: 14px; margin-top: 8px; }
+.qhead { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; justify-content: space-between; }
+.tag { font-family: var(--font-display); font-weight: 700; font-size: 1.3rem; line-height: 1.1; padding: 2px 6px 0; border-radius: 4px; }
+.qch { font-size: .8rem; color: var(--ink-2); }
+.prompt { margin: 0; font-size: 1.12rem; font-weight: 700; line-height: 1.35; }
+.panel { background: var(--card); border: 1.5px solid var(--line); border-radius: 14px; padding: 10px 12px; }
+.math { overflow-x: auto; overflow-y: hidden; max-width: 100%; padding: 4px 2px; }
+.math .katex-display { margin: .3em 0; }
+.math.raw { font-family: var(--font-mono); font-size: .8rem; white-space: pre-wrap; word-break: break-all; }
+.opts { display: grid; gap: 10px; }
+.opt {
+  display: grid; grid-template-columns: 26px 1fr; align-items: center; gap: 8px;
+  width: 100%; min-height: 58px; padding: 8px 10px; text-align: left;
+  border: 2px solid var(--line); border-radius: 14px; background: var(--card); cursor: pointer;
+}
+.opt:hover:not([disabled]) { border-color: var(--ink-2); }
+.opt .k { font-family: var(--font-mono); font-size: .78rem; font-weight: 600; color: var(--ink-2); border: 1.5px solid var(--line); border-radius: 6px; text-align: center; line-height: 22px; }
+.opt .math { padding: 2px 0; }
+.opt[disabled] { cursor: default; }
+.opt.ok { border-color: var(--good); background: var(--good-bg); }
+.opt.no { border-color: var(--bad); background: var(--bad-bg); }
+.opt.dim { opacity: .55; }
+.feedback { display: grid; gap: 10px; border-left: 5px solid var(--line); padding: 4px 0 4px 12px; }
+.feedback.ok { border-color: var(--good); }
+.feedback.no { border-color: var(--bad); }
+.verdict { font-family: var(--font-display); font-weight: 700; font-size: 1.35rem; line-height: 1.1; }
+.feedback.ok .verdict { color: var(--good); }
+.feedback.no .verdict { color: var(--bad); }
+.note { margin: 0; font-size: .95rem; color: var(--ink-2); }
+.grades { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.grades .btn { padding: 10px 8px; min-height: 52px; font-size: .95rem; }
+.btn.g-no { border-color: var(--bad); color: var(--bad); }
+.btn.g-ok { background: var(--good); color: var(--pen-ink); }
+.hint { margin: 0; color: var(--ink-2); font-size: .95rem; }
+
+/* risultati */
+.tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.tile { background: var(--card); border: 1.5px solid var(--line); border-radius: 14px; padding: 12px; display: grid; gap: 2px; }
+.tile b { font-family: var(--font-mono); font-size: 1.45rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.tile span { font-size: .8rem; color: var(--ink-2); }
+.review-list { display: grid; gap: 10px; }
+.rv { display: grid; gap: 4px; }
+.rv h3 { font-size: 1rem; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; }
+.row .btn { flex: 1 1 200px; }
+.levelup { font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; padding: 8px 12px; border-radius: 10px; background: var(--hl-3); }
+
+/* capitolo */
+.chhead { display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: center; }
+.chhead .cn { font-size: 2.4rem; padding: 10px 12px 6px; }
+.fl { display: grid; gap: 10px; }
+.fcard { display: grid; gap: 6px; }
+.fcard-top { display: flex; justify-content: space-between; gap: 10px; align-items: center; }
+.fcard-top h3 { font-size: 1rem; }
+.lvpips { display: flex; gap: 3px; flex: none; }
+.lvpips i { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--line); }
+.lvpips i.on { background: var(--pen); border-color: var(--pen); }
+
+/* lampo */
+.timer { flex: 1; height: 10px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.timer i { display: block; height: 100%; background: var(--hl-5); border-right: 2px solid var(--ink); }
+.score { font-family: var(--font-mono); font-weight: 600; font-size: 1.1rem; font-variant-numeric: tabular-nums; min-width: 3ch; text-align: right; }
+.swipe {
+  touch-action: pan-y; user-select: none; -webkit-user-select: none;
+  background: var(--card); border: 2px solid var(--ink); border-radius: 18px; padding: 14px 12px;
+  box-shadow: 4px 4px 0 var(--shadow); display: grid; gap: 8px; min-height: 170px; align-content: center;
+  transition: border-color .15s ease;
+}
+.swipe.ok { border-color: var(--good); }
+.swipe.no { border-color: var(--bad); }
+.swipe .qch { text-align: center; font-size: .9rem; font-weight: 700; color: var(--ink); }
+.vf { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.vf .btn { min-height: 60px; font-size: 1.05rem; }
+.btn.v-no { color: var(--bad); border-color: var(--bad); }
+.btn.v-yes { color: var(--good); border-color: var(--good); }
+.toast { min-height: 90px; display: grid; gap: 4px; align-content: start; font-size: .9rem; }
+.toast .t-head { font-weight: 700; color: var(--bad); }
+.combo { font-family: var(--font-mono); font-size: .82rem; font-weight: 600; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+</style>
+</head>
+<body>
+<header class="top" id="top"></header>
+<main class="wrap" id="app" aria-live="polite"></main>
+
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+<script>
+"use strict";
+const DATA = {
+ "chapters": [
+  "Oscillatore armonico",
+  "Oscillatore smorzato",
+  "Oscillatore forzato",
+  "Più gradi di libertà",
+  "Corda e D'Alembert",
+  "Riflessione e trasmissione",
+  "Onde acustiche",
+  "Onde in 3D",
+  "Doppler e Mach",
+  "Interferenza",
+  "Diffrazione e reticoli",
+  "Ottica geometrica"
+ ],
+ "cards": [
+  {
+   "c": 1,
+   "n": "Equazione del moto",
+   "q": "Equazione del moto dell'oscillatore armonico, scritta con ω₀",
+   "t": "\\ddot{x} + @@ = 0,\\qquad \\omega_0^2 = \\frac{\\alpha}{m}",
+   "a": "\\omega_0^2\\,x",
+   "d": [
+    "\\omega_0\\,x",
+    "\\omega_0^2\\,\\dot{x}",
+    "\\frac{m}{\\alpha}\\,x"
+   ],
+   "h": "Forza di richiamo F = −αx. Per piccole oscillazioni attorno a un minimo del potenziale α = U″(x₀).",
+   "id": "1.1"
+  },
+  {
+   "c": 1,
+   "n": "Pulsazione propria",
+   "q": "Pulsazione propria ω₀ per una forza di richiamo F = −αx",
+   "t": "\\omega_0 = @@",
+   "a": "\\sqrt{\\frac{\\alpha}{m}}",
+   "d": [
+    "\\sqrt{\\frac{m}{\\alpha}}",
+    "\\frac{\\alpha}{m}",
+    "2\\pi\\sqrt{\\frac{\\alpha}{m}}"
+   ],
+   "h": "α = U″(x₀), la curvatura del potenziale nel minimo. Molla: α = k; pendolo: α = mg/l.",
+   "id": "1.2"
+  },
+  {
+   "c": 1,
+   "n": "Soluzione generale",
+   "q": "Soluzione generale dell'oscillatore armonico, nelle due forme",
+   "t": "x(t) = A\\cos(\\omega_0 t) + B\\sin(\\omega_0 t) = @@",
+   "a": "C\\cos(\\omega_0 t + \\varphi)",
+   "d": [
+    "C\\cos(\\omega_0 t) + \\varphi",
+    "C\\,e^{-\\omega_0 t}\\cos\\varphi",
+    "C\\cos(\\omega_0 t)\\sin\\varphi"
+   ],
+   "h": "Due costanti arbitrarie, fissate dalle due condizioni iniziali.",
+   "id": "1.3"
+  },
+  {
+   "c": 1,
+   "n": "Periodo e frequenza",
+   "q": "Relazioni tra periodo T, frequenza ν e pulsazione ω₀",
+   "t": "T = @@,\\qquad \\nu = \\frac{1}{T},\\qquad \\omega_0 = 2\\pi\\nu",
+   "a": "\\frac{2\\pi}{\\omega_0}",
+   "d": [
+    "\\frac{1}{\\omega_0}",
+    "2\\pi\\,\\omega_0",
+    "\\frac{\\omega_0}{2\\pi}"
+   ],
+   "h": "ω₀ in rad/s, ν in Hz. Errore classico: T = 1/ω₀.",
+   "id": "1.4"
+  },
+  {
+   "c": 1,
+   "n": "Massa–molla",
+   "q": "Pulsazione e periodo del sistema massa–molla",
+   "t": "\\omega_0 = \\sqrt{\\frac{k}{m}},\\qquad T = @@",
+   "a": "2\\pi\\sqrt{\\frac{m}{k}}",
+   "d": [
+    "2\\pi\\sqrt{\\frac{k}{m}}",
+    "\\sqrt{\\frac{m}{k}}",
+    "\\frac{1}{2\\pi}\\sqrt{\\frac{k}{m}}"
+   ],
+   "h": "Caso α = k. Controllo: √(kg/(N/m)) = s.",
+   "id": "1.5"
+  },
+  {
+   "c": 1,
+   "n": "Pendolo semplice",
+   "q": "Pendolo semplice per piccoli angoli: equazione e periodo",
+   "t": "\\ddot{\\vartheta} + \\frac{g}{l}\\,\\vartheta = 0,\\qquad T = @@",
+   "a": "2\\pi\\sqrt{\\frac{l}{g}}",
+   "d": [
+    "2\\pi\\sqrt{\\frac{g}{l}}",
+    "2\\pi\\sqrt{\\frac{l}{mg}}",
+    "\\sqrt{\\frac{l}{g}}"
+   ],
+   "h": "Solo per θ ≪ 1 (sin θ ≈ θ). Non dipende da massa e ampiezza: isocronismo.",
+   "id": "1.6"
+  },
+  {
+   "c": 1,
+   "n": "Pendolo dal potenziale",
+   "q": "Potenziale del pendolo sviluppato per x ≪ l, con la prima correzione",
+   "t": "U(x) = mgl\\left[1-\\sqrt{1-\\frac{x^2}{l^2}}\\right] \\simeq @@",
+   "a": "\\frac{mg}{2l}\\,x^2 + \\frac{mg}{8l^3}\\,x^4",
+   "d": [
+    "\\frac{mg}{l}\\,x^2 + \\frac{mg}{2l^3}\\,x^4",
+    "\\frac{mgl}{2}\\,x^2 + \\frac{mgl}{8}\\,x^4",
+    "\\frac{mg}{2l}\\,x^2 - \\frac{mg}{8l^3}\\,x^4"
+   ],
+   "h": "Il termine in x² dà α = mg/l. Viene da √(1−u) ≈ 1 − u/2 − u²/8.",
+   "id": "1.7"
+  },
+  {
+   "c": 1,
+   "n": "Legge oraria con x₀ e v₀",
+   "q": "Legge oraria con condizioni iniziali x(0) = x₀ e ẋ(0) = v₀",
+   "t": "x(t) = x_0\\cos(\\omega_0 t) + @@\\,\\sin(\\omega_0 t)",
+   "a": "\\frac{v_0}{\\omega_0}",
+   "d": [
+    "v_0\\,\\omega_0",
+    "\\frac{\\omega_0}{v_0}",
+    "v_0"
+   ],
+   "h": "Se x₀ = 0 serve v₀ ≠ 0 (parte col seno); se v₀ = 0 parte da fermo (coseno).",
+   "id": "1.8"
+  },
+  {
+   "c": 1,
+   "n": "Ampiezza da x₀ e v₀",
+   "q": "Ampiezza C e fase φ dell'oscillatore libero, dati x₀ e v₀",
+   "t": "C = @@,\\qquad \\tan\\varphi = -\\frac{v_0}{\\omega_0\\,x_0}",
+   "a": "\\sqrt{x_0^2 + \\frac{v_0^2}{\\omega_0^2}}",
+   "d": [
+    "\\sqrt{x_0^2 + v_0^2}",
+    "x_0 + \\frac{v_0}{\\omega_0}",
+    "\\sqrt{x_0^2 + v_0^2\\,\\omega_0^2}"
+   ],
+   "h": "È il caso γ = 0 delle formule del sottosmorzato.",
+   "id": "1.9"
+  },
+  {
+   "c": 1,
+   "n": "Energia dell'oscillatore",
+   "q": "Energia totale dell'oscillatore armonico in funzione dell'ampiezza",
+   "t": "E = \\tfrac12 m\\dot{x}^2 + \\tfrac12\\alpha x^2 = @@",
+   "a": "\\tfrac12\\,m\\,\\omega_0^2 A^2",
+   "d": [
+    "\\tfrac12\\,m\\,\\omega_0 A^2",
+    "m\\,\\omega_0^2 A^2",
+    "\\tfrac12\\,m\\,\\omega_0^2 A"
+   ],
+   "h": "= ½αA² = ½mv²max con v_max = ω₀A. Costante: sistema conservativo. U e T sfasate.",
+   "id": "1.10"
+  },
+  {
+   "c": 2,
+   "n": "Equazione dello smorzato",
+   "q": "Equazione del moto dell'oscillatore con attrito viscoso",
+   "t": "\\ddot{x} + @@ + \\omega_0^2\\,x = 0",
+   "a": "2\\gamma\\,\\dot{x}",
+   "d": [
+    "\\gamma\\,\\dot{x}",
+    "2\\gamma\\,x",
+    "2\\gamma\\,\\ddot{x}"
+   ],
+   "h": "Forza viscosa F = −2γmẋ, con γ > 0 in s⁻¹.",
+   "id": "2.1"
+  },
+  {
+   "c": 2,
+   "n": "Equazione caratteristica",
+   "q": "Radici dell'equazione caratteristica dell'oscillatore smorzato",
+   "t": "\\lambda_{1,2} = @@",
+   "a": "-\\gamma \\pm \\sqrt{\\gamma^2 - \\omega_0^2}",
+   "d": [
+    "-\\gamma \\pm \\sqrt{\\omega_0^2 - \\gamma^2}",
+    "\\gamma \\pm \\sqrt{\\gamma^2 - \\omega_0^2}",
+    "-2\\gamma \\pm \\sqrt{\\gamma^2 - \\omega_0^2}"
+   ],
+   "h": "Da λ² + 2γλ + ω₀² = 0. Il segno di γ² − ω₀² decide il regime.",
+   "id": "2.2"
+  },
+  {
+   "c": 2,
+   "n": "Sovrasmorzato",
+   "q": "Soluzione nel regime sovrasmorzato (γ > ω₀)",
+   "t": "x(t) = @@",
+   "a": "C_1\\,e^{-|\\lambda_1| t} + C_2\\,e^{-|\\lambda_2| t}",
+   "d": [
+    "e^{-\\gamma t}\\,(C_1 + C_2\\,t)",
+    "A\\,e^{-\\gamma t}\\cos(\\omega t + \\varphi)",
+    "C_1\\,e^{|\\lambda_1| t} + C_2\\,e^{|\\lambda_2| t}"
+   ],
+   "h": "Somma di due decadimenti esponenziali, nessuna oscillazione.",
+   "id": "2.3"
+  },
+  {
+   "c": 2,
+   "n": "Smorzamento critico",
+   "q": "Soluzione nello smorzamento critico (γ = ω₀)",
+   "t": "x(t) = @@",
+   "a": "e^{-\\gamma t}\\,(C_1 + C_2\\,t)",
+   "d": [
+    "C_1\\,e^{-\\gamma t} + C_2\\,e^{-\\gamma t}",
+    "e^{-\\gamma t}\\,(C_1 + C_2)\\,t",
+    "e^{-2\\gamma t}\\,(C_1 + C_2\\,t)"
+   ],
+   "h": "Una sola radice: la seconda soluzione è t·e^(−γt). Ritorno all'equilibrio più rapido.",
+   "id": "2.4"
+  },
+  {
+   "c": 2,
+   "n": "Sottosmorzato",
+   "q": "Soluzione sottosmorzata (γ < ω₀) e la sua pulsazione ω",
+   "t": "x(t) = A\\,e^{-\\gamma t}\\cos(\\omega t + \\varphi),\\qquad \\omega = @@",
+   "a": "\\sqrt{\\omega_0^2 - \\gamma^2}",
+   "d": [
+    "\\sqrt{\\gamma^2 - \\omega_0^2}",
+    "\\sqrt{\\omega_0^2 + \\gamma^2}",
+    "\\omega_0 - \\gamma"
+   ],
+   "h": "ω < ω₀, quindi T > T₀. In τ = 1/γ l'ampiezza cala di un fattore 1/e.",
+   "id": "2.5"
+  },
+  {
+   "c": 2,
+   "n": "ω per piccolo smorzamento",
+   "q": "Correzione su ω quando γ ≪ ω₀",
+   "t": "\\omega \\simeq \\omega_0\\left[1 - @@\\right]",
+   "a": "\\frac12\\left(\\frac{\\gamma}{\\omega_0}\\right)^2",
+   "d": [
+    "\\frac{\\gamma}{\\omega_0}",
+    "\\left(\\frac{\\gamma}{\\omega_0}\\right)^2",
+    "\\frac12\\,\\frac{\\gamma}{\\omega_0}"
+   ],
+   "h": "Correzione del secondo ordine: spesso trascurabile in ω, mai nell'esponenziale.",
+   "id": "2.6"
+  },
+  {
+   "c": 2,
+   "n": "Ampiezza con x₀ e v₀",
+   "q": "Ampiezza A del sottosmorzato con condizioni iniziali x₀ e v₀",
+   "t": "A = \\sqrt{x_0^2 + \\frac{@@}{\\omega^2}}",
+   "a": "(v_0 + \\gamma x_0)^2",
+   "d": [
+    "v_0^2",
+    "(v_0 - \\gamma x_0)^2",
+    "(v_0 + \\omega x_0)^2"
+   ],
+   "h": "Da x₀ = A cos φ e v₀ = −γA cos φ − ωA sin φ. Con γ → 0 torna l'oscillatore libero.",
+   "id": "2.7"
+  },
+  {
+   "c": 2,
+   "n": "Fase con x₀ e v₀",
+   "q": "Fase φ del sottosmorzato con condizioni iniziali x₀ e v₀",
+   "t": "\\tan\\varphi = @@",
+   "a": "-\\frac{v_0 + \\gamma x_0}{\\omega\\,x_0}",
+   "d": [
+    "\\frac{v_0 + \\gamma x_0}{\\omega\\,x_0}",
+    "-\\frac{v_0}{\\omega\\,x_0}",
+    "-\\frac{\\omega\\,x_0}{v_0 + \\gamma x_0}"
+   ],
+   "h": "Se v₀ = 0 diventa tan φ = −γ/ω.",
+   "id": "2.8"
+  },
+  {
+   "c": 2,
+   "n": "Partenza da fermo",
+   "q": "Ampiezza del sottosmorzato se parte da fermo (v₀ = 0)",
+   "t": "A = x_0\\,@@",
+   "a": "\\sqrt{1 + \\frac{\\gamma^2}{\\omega^2}}",
+   "d": [
+    "\\sqrt{1 - \\frac{\\gamma^2}{\\omega^2}}",
+    "\\left(1 + \\frac{\\gamma}{\\omega}\\right)",
+    "\\sqrt{1 + \\frac{\\omega^2}{\\gamma^2}}"
+   ],
+   "h": "E la fase vale tan φ = −γ/ω.",
+   "id": "2.9"
+  },
+  {
+   "c": 2,
+   "n": "Energia che decade",
+   "q": "Energia dell'oscillatore smorzato nel tempo (γ ≪ ω₀)",
+   "t": "E(t) \\simeq \\tfrac12\\,m\\,\\omega_0^2 A^2\\,@@",
+   "a": "e^{-2\\gamma t}",
+   "d": [
+    "e^{-\\gamma t}",
+    "e^{-\\gamma t/2}",
+    "e^{-2\\gamma^2 t}"
+   ],
+   "h": "L'ampiezza decade con e^(−γt), l'energia con e^(−2γt).",
+   "id": "2.10"
+  },
+  {
+   "c": 2,
+   "n": "Potenza dissipata",
+   "q": "Potenza dissipata dall'attrito viscoso, dE/dt",
+   "t": "\\frac{dE}{dt} = @@",
+   "a": "-2\\gamma\\,m\\,\\dot{x}^2",
+   "d": [
+    "-\\gamma\\,m\\,\\dot{x}^2",
+    "-2\\gamma\\,m\\,x^2",
+    "-2\\gamma\\,\\dot{x}"
+   ],
+   "h": "= F_v·ẋ. Perdite massime a velocità massima, nulle nei punti di inversione.",
+   "id": "2.11"
+  },
+  {
+   "c": 3,
+   "n": "Equazione del forzato",
+   "q": "Equazione dell'oscillatore forzato con forzante armonica",
+   "t": "\\ddot{x} + 2\\gamma\\dot{x} + \\omega_0^2\\,x = @@",
+   "a": "\\frac{F_0}{m}\\cos(\\omega_F t)",
+   "d": [
+    "F_0\\cos(\\omega_F t)",
+    "\\frac{F_0}{m}\\cos(\\omega_0 t)",
+    "\\frac{F_0}{m}\\,e^{-\\gamma t}\\cos(\\omega_F t)"
+   ],
+   "h": "Non omogenea: soluzione = omogenea (transitorio) + particolare (regime).",
+   "id": "3.1"
+  },
+  {
+   "c": 3,
+   "n": "Transitorio + regime",
+   "q": "Soluzione generale dell'oscillatore forzato (transitorio più regime)",
+   "t": "x(t) = A\\,e^{-\\gamma t}\\cos(\\omega t + \\varphi_1) + @@",
+   "a": "B\\cos(\\omega_F t + \\varphi)",
+   "d": [
+    "B\\cos(\\omega_0 t + \\varphi)",
+    "B\\,e^{-\\gamma t}\\cos(\\omega_F t + \\varphi)",
+    "B\\cos(\\omega t + \\varphi)"
+   ],
+   "h": "Per t ≫ 1/γ resta solo il regime, alla frequenza della forzante.",
+   "id": "3.2"
+  },
+  {
+   "c": 3,
+   "n": "Ampiezza a regime",
+   "q": "Ampiezza a regime B(ω_F) dell'oscillatore forzato",
+   "t": "B = \\frac{F_0}{m\\sqrt{@@}}",
+   "a": "(\\omega_0^2 - \\omega_F^2)^2 + 4\\gamma^2\\omega_F^2",
+   "d": [
+    "(\\omega_0^2 - \\omega_F^2)^2 + 2\\gamma^2\\omega_F^2",
+    "(\\omega_0 - \\omega_F)^2 + 4\\gamma^2\\omega_F^2",
+    "(\\omega_0^2 - \\omega_F^2)^2 + 4\\gamma^2\\omega_0^2"
+   ],
+   "h": "Il 4 viene da (2γ)². B e φ non dipendono dalle condizioni iniziali.",
+   "id": "3.3"
+  },
+  {
+   "c": 3,
+   "n": "Fase a regime",
+   "q": "Fase φ della soluzione a regime del forzato",
+   "t": "\\tan\\varphi = @@",
+   "a": "\\frac{2\\gamma\\,\\omega_F}{\\omega_F^2 - \\omega_0^2}",
+   "d": [
+    "\\frac{2\\gamma\\,\\omega_F}{\\omega_0^2 - \\omega_F^2}",
+    "\\frac{\\gamma\\,\\omega_F}{\\omega_F^2 - \\omega_0^2}",
+    "\\frac{\\omega_F^2 - \\omega_0^2}{2\\gamma\\,\\omega_F}"
+   ],
+   "h": "Da ω₀² − ω_F² = (F₀/Bm) cos φ e 2γω_F = −(F₀/Bm) sin φ.",
+   "id": "3.4"
+  },
+  {
+   "c": 3,
+   "n": "Ampiezza alla risonanza",
+   "q": "Ampiezza a regime alla risonanza (ω_F = ω₀)",
+   "t": "B(\\omega_0) = @@",
+   "a": "\\frac{F_0}{2m\\gamma\\,\\omega_0}",
+   "d": [
+    "\\frac{F_0}{m\\gamma\\,\\omega_0}",
+    "\\frac{F_0}{2m\\gamma}",
+    "\\frac{F_0}{2m\\,\\omega_0^2}"
+   ],
+   "h": "Cresce al diminuire di γ; per γ → 0 diverge.",
+   "id": "3.5"
+  },
+  {
+   "c": 3,
+   "n": "Fase alla risonanza",
+   "q": "Fase dello spostamento rispetto alla forzante alla risonanza",
+   "t": "\\omega_F = \\omega_0 \\;\\Rightarrow\\; \\tan\\varphi = \\pm\\infty,\\quad \\varphi = @@",
+   "a": "-\\frac{\\pi}{2}",
+   "d": [
+    "0",
+    "-\\pi",
+    "-\\frac{\\pi}{4}"
+   ],
+   "h": "Spostamento in quadratura con la forzante: la forza è in fase con la velocità. Negli appunti: φ = ±π/2.",
+   "id": "3.6"
+  },
+  {
+   "c": 3,
+   "n": "Energia a regime",
+   "q": "Energia dell'oscillatore forzato a regime (ω = ω_F)",
+   "t": "E(t) = \\tfrac12\\,mB^2\\left[@@\\right]",
+   "a": "\\omega^2\\sin^2(\\omega t + \\varphi) + \\omega_0^2\\cos^2(\\omega t + \\varphi)",
+   "d": [
+    "\\omega_0^2\\sin^2(\\omega t + \\varphi) + \\omega^2\\cos^2(\\omega t + \\varphi)",
+    "\\omega^2\\sin^2(\\omega t + \\varphi) + \\omega^2\\cos^2(\\omega t + \\varphi)",
+    "\\omega^2\\cos^2(\\omega t + \\varphi) - \\omega_0^2\\sin^2(\\omega t + \\varphi)"
+   ],
+   "h": "Costante solo a risonanza: E = ½mω₀²B². Altrimenti oscilla tra ½mB²ω² e ½mB²ω₀².",
+   "id": "3.7"
+  },
+  {
+   "c": 4,
+   "n": "Pendoli accoppiati",
+   "q": "Equazione del moto del primo di due pendoli accoppiati da una molla k",
+   "t": "m\\ddot{x}_1 = -\\frac{mg}{l}\\,x_1 - @@",
+   "a": "k\\,(x_1 - x_2)",
+   "d": [
+    "k\\,(x_2 - x_1)",
+    "k\\,x_1",
+    "2k\\,(x_1 - x_2)"
+   ],
+   "h": "Per x₂ è uguale con k(x₂ − x₁). Si disaccoppiano con u_a = x₁ + x₂ e u_b = x₁ − x₂.",
+   "id": "4.1"
+  },
+  {
+   "c": 4,
+   "n": "Frequenze dei due modi",
+   "q": "Pulsazioni dei due modi normali dei pendoli accoppiati",
+   "t": "\\omega_a = \\sqrt{\\frac{g}{l}},\\qquad \\omega_b = @@",
+   "a": "\\sqrt{\\frac{g}{l} + \\frac{2k}{m}}",
+   "d": [
+    "\\sqrt{\\frac{g}{l} + \\frac{k}{m}}",
+    "\\sqrt{\\frac{g}{l}} + \\sqrt{\\frac{2k}{m}}",
+    "\\sqrt{\\frac{2k}{m}}"
+   ],
+   "h": "Modo a, a pendolo: x₁ = x₂, la molla non lavora. Modo b, a respiro: x₁ = −x₂.",
+   "id": "4.2"
+  },
+  {
+   "c": 4,
+   "n": "Coordinate normali",
+   "q": "Coordinate che disaccoppiano le equazioni dei pendoli accoppiati",
+   "t": "u_a = x_1 + x_2,\\qquad u_b = @@",
+   "a": "x_1 - x_2",
+   "d": [
+    "x_1 + 2x_2",
+    "2x_1 - x_2",
+    "\\frac{x_1 + x_2}{2}"
+   ],
+   "h": "Si ottengono sommando e sottraendo le due equazioni: ognuna diventa un oscillatore armonico.",
+   "id": "4.3"
+  },
+  {
+   "c": 4,
+   "n": "Moto come somma di modi",
+   "q": "Moto di x₂ come sovrapposizione dei due modi normali",
+   "t": "x_2(t) = @@",
+   "a": "C_a\\cos(\\omega_a t + \\varphi_a) - C_b\\cos(\\omega_b t + \\varphi_b)",
+   "d": [
+    "C_a\\cos(\\omega_a t + \\varphi_a) + C_b\\cos(\\omega_b t + \\varphi_b)",
+    "-C_a\\cos(\\omega_a t + \\varphi_a) - C_b\\cos(\\omega_b t + \\varphi_b)",
+    "C_b\\cos(\\omega_a t + \\varphi_a) - C_a\\cos(\\omega_b t + \\varphi_b)"
+   ],
+   "h": "Per x₁ c'è il segno +. Costanti dalle condizioni iniziali.",
+   "id": "4.4"
+  },
+  {
+   "c": 4,
+   "n": "Battimenti",
+   "q": "Battimenti: somma di due oscillazioni di uguale ampiezza e frequenze vicine",
+   "t": "A\\left[\\cos(\\omega_a t) + \\cos(\\omega_b t)\\right] = @@",
+   "a": "2A\\cos\\left(\\frac{\\omega_a + \\omega_b}{2}\\,t\\right)\\cos\\left(\\frac{\\omega_a - \\omega_b}{2}\\,t\\right)",
+   "d": [
+    "2A\\cos\\left((\\omega_a + \\omega_b)\\,t\\right)\\cos\\left((\\omega_a - \\omega_b)\\,t\\right)",
+    "A\\cos\\left(\\frac{\\omega_a + \\omega_b}{2}\\,t\\right)\\cos\\left(\\frac{\\omega_a - \\omega_b}{2}\\,t\\right)",
+    "2A\\sin\\left(\\frac{\\omega_a + \\omega_b}{2}\\,t\\right)\\sin\\left(\\frac{\\omega_a - \\omega_b}{2}\\,t\\right)"
+   ],
+   "h": "Il secondo coseno è l'inviluppo lento: la sua frequenza è la semidifferenza.",
+   "id": "4.5"
+  },
+  {
+   "c": 4,
+   "n": "Due masse su corda",
+   "q": "Due masse su una corda tesa (tensione T₀, passo a): pulsazioni dei modi",
+   "t": "\\omega_a^2 = \\frac{T_0}{ma},\\qquad \\omega_b^2 = @@",
+   "a": "\\frac{3T_0}{ma}",
+   "d": [
+    "\\frac{2T_0}{ma}",
+    "\\frac{T_0}{3ma}",
+    "\\frac{4T_0}{ma}"
+   ],
+   "h": "Modo a: y₁ = y₂. Modo b: y₁ = −y₂.",
+   "id": "4.6"
+  },
+  {
+   "c": 4,
+   "n": "Equazione della prima massa",
+   "q": "Equazione della prima di due masse su una corda tesa",
+   "t": "\\ddot{y}_1 = @@\\,y_1 + \\frac{T_0}{ma}\\,y_2",
+   "a": "-\\frac{2T_0}{ma}",
+   "d": [
+    "-\\frac{T_0}{ma}",
+    "+\\frac{2T_0}{ma}",
+    "-\\frac{3T_0}{ma}"
+   ],
+   "h": "Conta solo la componente verticale della tensione, per y/a ≪ 1.",
+   "id": "4.7"
+  },
+  {
+   "c": 4,
+   "n": "Collana di perle",
+   "q": "Equazione della massa i-esima in una catena di N masse",
+   "t": "\\ddot{y}_i = -\\frac{T_0}{ma}\\left[@@\\right]",
+   "a": "2y_i - y_{i-1} - y_{i+1}",
+   "d": [
+    "y_{i-1} - 2y_i + y_{i+1}",
+    "2y_i + y_{i-1} + y_{i+1}",
+    "y_i - y_{i-1} - y_{i+1}"
+   ],
+   "h": "Per a → 0 diventa l'equazione di D'Alembert con ρ_L = m/a.",
+   "id": "4.8"
+  },
+  {
+   "c": 4,
+   "n": "Passaggio al continuo",
+   "q": "Equazione che si ottiene dalla catena di masse per a → 0",
+   "t": "\\frac{\\partial^2 y}{\\partial t^2} = @@\\,\\frac{\\partial^2 y}{\\partial x^2}",
+   "a": "\\frac{T_0}{\\rho_L}",
+   "d": [
+    "\\frac{\\rho_L}{T_0}",
+    "\\sqrt{\\frac{T_0}{\\rho_L}}",
+    "\\frac{T_0}{m}"
+   ],
+   "h": "ρ_L = m/a densità lineare. n gradi di libertà, n modi normali; il continuo ne ha infiniti.",
+   "id": "4.9"
+  },
+  {
+   "c": 5,
+   "n": "Equazione di D'Alembert",
+   "q": "Equazione di D'Alembert e velocità di fase della corda",
+   "t": "\\frac{\\partial^2\\psi}{\\partial t^2} = v^2\\,\\frac{\\partial^2\\psi}{\\partial x^2},\\qquad v = @@",
+   "a": "\\sqrt{\\frac{T_0}{\\rho_L}}",
+   "d": [
+    "\\sqrt{\\frac{\\rho_L}{T_0}}",
+    "\\frac{T_0}{\\rho_L}",
+    "\\sqrt{T_0\\,\\rho_L}"
+   ],
+   "h": "Lineare e omogenea: vale la sovrapposizione. v dipende solo dal mezzo.",
+   "id": "5.1"
+  },
+  {
+   "c": 5,
+   "n": "Soluzione di D'Alembert",
+   "q": "Soluzione generale dell'equazione di D'Alembert in 1D",
+   "t": "\\psi(x,t) = @@",
+   "a": "f(x - vt) + g(x + vt)",
+   "d": [
+    "f(x - vt)\\,g(x + vt)",
+    "f(x - v^2 t) + g(x + v^2 t)",
+    "f(x - vt) + g(x - vt)"
+   ],
+   "h": "f va verso destra (progressiva), g verso sinistra (regressiva).",
+   "id": "5.2"
+  },
+  {
+   "c": 5,
+   "n": "Onda progressiva",
+   "q": "Relazione tra le derivate per un'onda progressiva f(x − vt)",
+   "t": "\\frac{\\partial\\psi}{\\partial t} = @@",
+   "a": "-v\\,\\frac{\\partial\\psi}{\\partial x}",
+   "d": [
+    "+v\\,\\frac{\\partial\\psi}{\\partial x}",
+    "-v^2\\,\\frac{\\partial\\psi}{\\partial x}",
+    "-\\frac{1}{v}\\,\\frac{\\partial\\psi}{\\partial x}"
+   ],
+   "h": "Per l'onda regressiva g(x + vt) il segno è +.",
+   "id": "5.3"
+  },
+  {
+   "c": 5,
+   "n": "Onda armonica",
+   "q": "Onda armonica progressiva: legame tra v, ω, k, λ e ν",
+   "t": "\\psi = A\\sin(kx - \\omega t),\\qquad k = \\frac{2\\pi}{\\lambda},\\qquad v = @@",
+   "a": "\\frac{\\omega}{k} = \\lambda\\nu",
+   "d": [
+    "\\frac{k}{\\omega} = \\frac{\\lambda}{\\nu}",
+    "\\omega\\,k = \\lambda\\nu",
+    "\\frac{\\omega}{k} = \\frac{\\lambda}{\\nu}"
+   ],
+   "h": "ω = 2πν = 2π/T.",
+   "id": "5.4"
+  },
+  {
+   "c": 5,
+   "n": "Forma del modo",
+   "q": "Equazione per la forma spaziale y(x) di un modo normale",
+   "t": "\\frac{d^2 y}{dx^2} + k^2\\,y = 0,\\qquad k^2 = @@",
+   "a": "\\frac{\\omega^2}{v^2}",
+   "d": [
+    "\\frac{v^2}{\\omega^2}",
+    "\\omega^2 v^2",
+    "\\frac{\\omega}{v}"
+   ],
+   "h": "Un oscillatore armonico in x: y(x) = A cos(kx + φ).",
+   "id": "5.5"
+  },
+  {
+   "c": 5,
+   "n": "Corda fissa agli estremi",
+   "q": "Corda di lunghezza L fissata agli estremi: k_n, λ_n e ν_n",
+   "t": "k_n = \\frac{n\\pi}{L},\\qquad \\lambda_n = @@,\\qquad \\nu_n = \\frac{n\\,v}{2L}",
+   "a": "\\frac{2L}{n}",
+   "d": [
+    "\\frac{L}{n}",
+    "\\frac{4L}{n}",
+    "\\frac{2L}{2n-1}"
+   ],
+   "h": "Fondamentale λ₁ = 2L, secondo modo λ₂ = L.",
+   "id": "5.6"
+  },
+  {
+   "c": 5,
+   "n": "Modi normali della corda",
+   "q": "Soluzione generale della corda fissa come somma di modi normali",
+   "t": "\\psi(x,t) = \\sum_{n=1}^{\\infty} A_n\\,@@",
+   "a": "\\sin(k_n x)\\cos(\\omega_n t + \\varphi_n)",
+   "d": [
+    "\\cos(k_n x)\\cos(\\omega_n t + \\varphi_n)",
+    "\\sin(k_n x - \\omega_n t + \\varphi_n)",
+    "\\sin(\\omega_n x)\\cos(k_n t + \\varphi_n)"
+   ],
+   "h": "Con estremi fissi la forma è sin(kx), non cos. A_n e φ_n dalle condizioni iniziali.",
+   "id": "5.7"
+  },
+  {
+   "c": 5,
+   "n": "Stazionaria = due progressive",
+   "q": "Onda stazionaria scritta come somma di due onde progressive opposte",
+   "t": "A\\sin(kx)\\cos(\\omega t) = @@",
+   "a": "\\frac{A}{2}\\left[\\sin(kx + \\omega t) + \\sin(kx - \\omega t)\\right]",
+   "d": [
+    "A\\left[\\sin(kx + \\omega t) + \\sin(kx - \\omega t)\\right]",
+    "\\frac{A}{2}\\left[\\sin(kx + \\omega t) - \\sin(kx - \\omega t)\\right]",
+    "\\frac{A}{2}\\left[\\cos(kx + \\omega t) + \\cos(kx - \\omega t)\\right]"
+   ],
+   "h": "Prostaferesi: sin a cos b = ½[sin(a + b) + sin(a − b)].",
+   "id": "5.8"
+  },
+  {
+   "c": 5,
+   "n": "Potenza istantanea",
+   "q": "Potenza istantanea trasportata lungo la corda",
+   "t": "P(x,t) = @@",
+   "a": "-T_0\\,\\frac{\\partial\\psi}{\\partial x}\\,\\frac{\\partial\\psi}{\\partial t}",
+   "d": [
+    "T_0\\,\\frac{\\partial\\psi}{\\partial x}\\,\\frac{\\partial\\psi}{\\partial t}",
+    "-T_0\\,\\frac{\\partial^2\\psi}{\\partial x^2}\\,\\frac{\\partial\\psi}{\\partial t}",
+    "-\\rho_L\\,\\frac{\\partial\\psi}{\\partial x}\\,\\frac{\\partial\\psi}{\\partial t}"
+   ],
+   "h": "Viene dalla componente trasversale della tensione, T_ψ ≈ −T₀ ∂ψ/∂x.",
+   "id": "5.9"
+  },
+  {
+   "c": 5,
+   "n": "Potenza dell'onda progressiva",
+   "q": "Potenza di un'onda progressiva in funzione delle derivate",
+   "t": "P = T_0\\,v\\left(\\frac{\\partial\\psi}{\\partial x}\\right)^2 = @@",
+   "a": "\\frac{T_0}{v}\\left(\\frac{\\partial\\psi}{\\partial t}\\right)^2",
+   "d": [
+    "T_0\\,v\\left(\\frac{\\partial\\psi}{\\partial t}\\right)^2",
+    "\\frac{v}{T_0}\\left(\\frac{\\partial\\psi}{\\partial t}\\right)^2",
+    "-\\frac{T_0}{v}\\left(\\frac{\\partial\\psi}{\\partial t}\\right)^2"
+   ],
+   "h": "L'energia fluisce nel verso di propagazione.",
+   "id": "5.10"
+  },
+  {
+   "c": 5,
+   "n": "Potenza media",
+   "q": "Potenza media trasportata da un'onda armonica su corda",
+   "t": "\\langle P\\rangle = @@",
+   "a": "\\tfrac12\\,T_0 A^2 k\\,\\omega",
+   "d": [
+    "T_0 A^2 k\\,\\omega",
+    "\\tfrac12\\,T_0 A\\,k\\,\\omega",
+    "\\tfrac12\\,T_0 A^2\\,\\frac{\\omega}{k}"
+   ],
+   "h": "= ½ρ_L v ω²A². Istantanea: T₀A²kω cos²(kx − ωt).",
+   "id": "5.11"
+  },
+  {
+   "c": 5,
+   "n": "Perdite radiative",
+   "q": "Massa su molla K legata a una corda infinita: smorzamento γ dovuto alle onde",
+   "t": "\\ddot{y} + 2\\gamma\\dot{y} + \\omega_0^2\\,y = 0,\\qquad \\gamma = @@",
+   "a": "\\frac{T_0}{m\\,v}",
+   "d": [
+    "\\frac{2T_0}{m\\,v}",
+    "\\frac{T_0\\,v}{m}",
+    "\\frac{m\\,v}{T_0}"
+   ],
+   "h": "Da mÿ = −Ky − (2T₀/v)ẏ: le onde emesse sui due lati fanno da attrito. ω₀² = K/m.",
+   "id": "5.12"
+  },
+  {
+   "c": 6,
+   "n": "Condizioni di raccordo",
+   "q": "Le due condizioni di raccordo in x = 0 (continuità ed energia)",
+   "t": "\\psi_{0i} + \\psi_{0r} = \\psi_{0t},\\qquad \\psi_{0i}^2\\,k_1 = @@",
+   "a": "\\psi_{0r}^2\\,k_1 + \\psi_{0t}^2\\,k_2",
+   "d": [
+    "\\psi_{0r}^2\\,k_2 + \\psi_{0t}^2\\,k_1",
+    "\\psi_{0r}^2\\,k_1 - \\psi_{0t}^2\\,k_2",
+    "(\\psi_{0r} + \\psi_{0t})^2\\,k_1"
+   ],
+   "h": "1) la corda non si spezza; 2) la potenza incidente si divide tra riflessa e trasmessa. ω è la stessa.",
+   "id": "6.1"
+  },
+  {
+   "c": 6,
+   "n": "Coefficienti r e t",
+   "q": "Coefficienti di riflessione e trasmissione per l'ampiezza, in funzione di k",
+   "t": "r = \\frac{k_1 - k_2}{k_1 + k_2},\\qquad t = @@",
+   "a": "\\frac{2k_1}{k_1 + k_2}",
+   "d": [
+    "\\frac{2k_2}{k_1 + k_2}",
+    "\\frac{k_1 + k_2}{2k_1}",
+    "\\frac{k_2 - k_1}{k_1 + k_2}"
+   ],
+   "h": "Vale sempre 1 + r = t.",
+   "id": "6.2"
+  },
+  {
+   "c": 6,
+   "n": "r e t con le densità",
+   "q": "Coefficienti r e t in funzione delle densità ρ₁ e ρ₂",
+   "t": "r = @@,\\qquad t = \\frac{2\\sqrt{\\rho_1}}{\\sqrt{\\rho_1} + \\sqrt{\\rho_2}}",
+   "a": "\\frac{\\sqrt{\\rho_1} - \\sqrt{\\rho_2}}{\\sqrt{\\rho_1} + \\sqrt{\\rho_2}}",
+   "d": [
+    "\\frac{\\sqrt{\\rho_2} - \\sqrt{\\rho_1}}{\\sqrt{\\rho_1} + \\sqrt{\\rho_2}}",
+    "\\frac{\\rho_1 - \\rho_2}{\\rho_1 + \\rho_2}",
+    "\\frac{\\sqrt{\\rho_1} + \\sqrt{\\rho_2}}{\\sqrt{\\rho_1} - \\sqrt{\\rho_2}}"
+   ],
+   "h": "A parità di tensione e frequenza k ∝ √ρ.",
+   "id": "6.3"
+  },
+  {
+   "c": 6,
+   "n": "Coefficienti di energia",
+   "q": "Coefficienti di riflessione e trasmissione per l'energia",
+   "t": "R = r^2,\\qquad T = @@",
+   "a": "1 - R = \\frac{k_2}{k_1}\\,t^2",
+   "d": [
+    "t^2",
+    "1 + R",
+    "\\frac{k_1}{k_2}\\,t^2"
+   ],
+   "h": "t può valere 2 senza violare l'energia: conta T, non t.",
+   "id": "6.4"
+  },
+  {
+   "c": 6,
+   "n": "Estremo fisso",
+   "q": "Caso limite ρ₁ ≪ ρ₂ (estremo fisso): quanto valgono r e t?",
+   "t": "\\rho_1 \\ll \\rho_2:\\quad @@",
+   "a": "r = -1,\\quad t = 0",
+   "d": [
+    "r = 1,\\quad t = 2",
+    "r = 0,\\quad t = 1",
+    "r = -1,\\quad t = 2"
+   ],
+   "h": "Solo riflessione, con l'impulso capovolto (sfasamento π).",
+   "id": "6.5"
+  },
+  {
+   "c": 6,
+   "n": "Estremo libero",
+   "q": "Caso limite ρ₂ ≪ ρ₁ (estremo libero): quanto valgono r e t?",
+   "t": "\\rho_2 \\ll \\rho_1:\\quad @@",
+   "a": "r = 1,\\quad t = 2",
+   "d": [
+    "r = -1,\\quad t = 0",
+    "r = 0,\\quad t = 1",
+    "r = 1,\\quad t = 0"
+   ],
+   "h": "L'onda riflessa mantiene la stessa fase.",
+   "id": "6.6"
+  },
+  {
+   "c": 6,
+   "n": "Riflessa capovolta",
+   "q": "Quando l'onda riflessa è capovolta (r < 0)?",
+   "t": "r < 0 \\iff @@",
+   "a": "\\rho_1 < \\rho_2",
+   "d": [
+    "\\rho_1 > \\rho_2",
+    "k_1 > k_2",
+    "v_1 < v_2"
+   ],
+   "h": "Il secondo mezzo è più denso: sfasamento di π. Equivale a k₁ < k₂ e v₁ > v₂.",
+   "id": "6.7"
+  },
+  {
+   "c": 7,
+   "n": "Velocità nel tubo sonoro",
+   "q": "Velocità del suono nel tubo sonoro e modulo di compressibilità β",
+   "t": "v = \\sqrt{\\frac{\\beta}{\\rho_0}},\\qquad \\beta = @@",
+   "a": "\\rho_0\\left.\\frac{\\partial P}{\\partial \\rho}\\right|_0",
+   "d": [
+    "\\frac{1}{\\rho_0}\\left.\\frac{\\partial P}{\\partial \\rho}\\right|_0",
+    "\\rho_0\\left.\\frac{\\partial \\rho}{\\partial P}\\right|_0",
+    "P_0\\left.\\frac{\\partial P}{\\partial \\rho}\\right|_0"
+   ],
+   "h": "ψ è lo spostamento longitudinale delle particelle di fluido.",
+   "id": "7.1"
+  },
+  {
+   "c": 7,
+   "n": "Onda di densità",
+   "q": "Onda di densità e onda di pressione legate allo spostamento ψ",
+   "t": "d\\rho = @@,\\qquad dP = \\frac{\\beta}{\\rho_0}\\,d\\rho",
+   "a": "-\\rho_0\\,\\frac{\\partial\\psi}{\\partial x}",
+   "d": [
+    "\\rho_0\\,\\frac{\\partial\\psi}{\\partial x}",
+    "-\\rho_0\\,\\frac{\\partial\\psi}{\\partial t}",
+    "-\\frac{1}{\\rho_0}\\,\\frac{\\partial\\psi}{\\partial x}"
+   ],
+   "h": "dP è in fase con dρ e in quadratura con ψ. Nodo di spostamento = ventre di pressione.",
+   "id": "7.2"
+  },
+  {
+   "c": 7,
+   "n": "Onda di pressione",
+   "q": "Onda di pressione quando ψ = A cos(kx − ωt)",
+   "t": "dP(x,t) = @@\\,\\sin(kx - \\omega t)",
+   "a": "A\\,\\beta\\,k",
+   "d": [
+    "A\\,\\beta\\,\\omega",
+    "A\\,\\rho_0\\,k",
+    "\\frac{A\\,\\beta}{k}"
+   ],
+   "h": "E dρ = Aρ₀k sin(kx − ωt).",
+   "id": "7.3"
+  },
+  {
+   "c": 7,
+   "n": "Ipotesi isoterma (Newton)",
+   "q": "Velocità del suono nell'ipotesi isoterma di Newton",
+   "t": "v_{iso} = @@ \\simeq 280\\ \\mathrm{m/s}",
+   "a": "\\sqrt{\\frac{P_0}{\\rho_0}}",
+   "d": [
+    "\\sqrt{\\frac{\\rho_0}{P_0}}",
+    "\\sqrt{\\frac{\\gamma P_0}{\\rho_0}}",
+    "\\frac{P_0}{\\rho_0}"
+   ],
+   "h": "Sbagliata rispetto alle misure: le compressioni sono troppo rapide per essere isoterme.",
+   "id": "7.4"
+  },
+  {
+   "c": 7,
+   "n": "Ipotesi adiabatica (Laplace)",
+   "q": "Velocità del suono nell'ipotesi adiabatica di Laplace",
+   "t": "v = @@ \\simeq 331\\ \\mathrm{m/s}",
+   "a": "\\sqrt{\\frac{\\gamma P_0}{\\rho_0}}",
+   "d": [
+    "\\gamma\\sqrt{\\frac{P_0}{\\rho_0}}",
+    "\\sqrt{\\frac{P_0}{\\gamma\\,\\rho_0}}",
+    "\\sqrt{\\frac{P_0}{\\rho_0}}"
+   ],
+   "h": "≈ 1,183 volte il valore di Newton (√1,4).",
+   "id": "7.5"
+  },
+  {
+   "c": 7,
+   "n": "Suono e temperatura",
+   "q": "Velocità del suono in funzione della temperatura (aria)",
+   "t": "v = \\sqrt{\\frac{\\gamma\\,k_B T}{\\mu}} = @@",
+   "a": "\\alpha\\sqrt{T},\\quad \\alpha \\simeq 20{,}05\\ \\mathrm{m\\,s^{-1}K^{-1/2}}",
+   "d": [
+    "\\alpha\\,T,\\quad \\alpha \\simeq 20{,}05\\ \\mathrm{m\\,s^{-1}K^{-1}}",
+    "\\alpha\\sqrt{T},\\quad \\alpha \\simeq 331\\ \\mathrm{m\\,s^{-1}K^{-1/2}}",
+    "\\frac{\\alpha}{\\sqrt{T}},\\quad \\alpha \\simeq 20{,}05\\ \\mathrm{m\\,s^{-1}K^{1/2}}"
+   ],
+   "h": "μ = massa di una molecola. A 273 K: 20,05·√273 ≈ 331 m/s.",
+   "id": "7.6"
+  },
+  {
+   "c": 7,
+   "n": "Gas perfetti",
+   "q": "Equazione di stato dei gas perfetti in due forme",
+   "t": "PV = nRT = @@,\\qquad k_B = \\frac{R}{N_A}",
+   "a": "N\\,k_B\\,T",
+   "d": [
+    "n\\,k_B\\,T",
+    "N\\,R\\,T",
+    "\\frac{N}{N_A}\\,k_B\\,T"
+   ],
+   "h": "N = n·N_A. k_B = 1,38·10⁻²³ J/K, N_A = 6,022·10²³.",
+   "id": "7.7"
+  },
+  {
+   "c": 7,
+   "n": "Adiabatica e γ",
+   "q": "Legge dell'adiabatica e valore di γ con η gradi di libertà",
+   "t": "PV^{\\gamma} = \\text{costante},\\qquad \\gamma = @@",
+   "a": "\\frac{\\eta + 2}{\\eta}",
+   "d": [
+    "\\frac{\\eta}{\\eta + 2}",
+    "\\frac{\\eta + 1}{\\eta}",
+    "\\frac{\\eta + 2}{2}"
+   ],
+   "h": "Monoatomico η = 3: γ = 5/3. Biatomico, come l'aria, η = 5: γ = 7/5.",
+   "id": "7.8"
+  },
+  {
+   "c": 7,
+   "n": "Energia interna",
+   "q": "Energia interna di un gas con η gradi di libertà",
+   "t": "U = @@ = \\frac{\\eta}{2}\\,PV",
+   "a": "\\frac{\\eta}{2}\\,N\\,k_B\\,T",
+   "d": [
+    "\\frac{3}{2}\\,\\eta\\,N\\,k_B\\,T",
+    "\\eta\\,N\\,k_B\\,T",
+    "\\frac{\\eta}{2}\\,k_B\\,T"
+   ],
+   "h": "Per particella ε = (η/2)k_BT. In adiabatica dU = −P dV.",
+   "id": "7.9"
+  },
+  {
+   "c": 7,
+   "n": "Intensità acustica",
+   "q": "Intensità media di un'onda acustica armonica, in funzione della pressione",
+   "t": "\\bar{I} = \\tfrac12\\,\\gamma P_0 A^2 k\\,\\omega = @@",
+   "a": "\\frac12\\,\\frac{dP_{max}^2}{\\rho_0\\,v}",
+   "d": [
+    "\\frac12\\,\\frac{dP_{max}^2}{\\gamma P_0}",
+    "\\frac12\\,dP_{max}^2\\,\\rho_0\\,v",
+    "\\frac{dP_{max}}{2\\,\\rho_0\\,v}"
+   ],
+   "h": "dP_max = γP₀kA. Equivale anche a ½ρ₀ω²A²v.",
+   "id": "7.10"
+  },
+  {
+   "c": 7,
+   "n": "Spostamento massimo",
+   "q": "Ampiezza di spostamento s_max da un'intensità I",
+   "t": "s_{max} = @@",
+   "a": "\\sqrt{\\frac{2I}{\\rho_0\\,\\omega^2 v}}",
+   "d": [
+    "\\sqrt{\\frac{I}{2\\rho_0\\,\\omega^2 v}}",
+    "\\frac{2I}{\\rho_0\\,\\omega^2 v}",
+    "\\sqrt{\\frac{2I\\,v}{\\rho_0\\,\\omega^2}}"
+   ],
+   "h": "Da I = ½ρ₀ω²s²_max v.",
+   "id": "7.11"
+  },
+  {
+   "c": 7,
+   "n": "Livello in decibel",
+   "q": "Livello sonoro in decibel e intensità di riferimento",
+   "t": "L = @@\\ \\ \\mathrm{dB},\\qquad I_0 = 10^{-12}\\ \\mathrm{W/m^2}",
+   "a": "10\\log_{10}\\frac{I}{I_0}",
+   "d": [
+    "20\\log_{10}\\frac{I}{I_0}",
+    "10\\ln\\frac{I}{I_0}",
+    "\\log_{10}\\frac{I}{I_0}"
+   ],
+   "h": "0 dB soglia di udibilità, 120 dB soglia del dolore (1 W/m²). +10 dB = intensità ×10.",
+   "id": "7.12"
+  },
+  {
+   "c": 7,
+   "n": "Attenuazione geometrica",
+   "q": "Intensità a distanza r da una sorgente puntiforme",
+   "t": "I(r) = @@",
+   "a": "\\frac{P}{\\Omega\\,r^2}",
+   "d": [
+    "\\frac{P}{\\Omega\\,r}",
+    "\\frac{P\\,r^2}{\\Omega}",
+    "\\frac{P}{4\\pi\\,\\Omega\\,r^2}"
+   ],
+   "h": "Ω angolo solido di emissione: 4π se la sorgente emette in tutte le direzioni.",
+   "id": "7.13"
+  },
+  {
+   "c": 7,
+   "n": "Lambert–Beer",
+   "q": "Legge di Lambert–Beer per l'assorbimento",
+   "t": "dI = -\\alpha\\,I\\,dz \\;\\Rightarrow\\; I(z) = @@",
+   "a": "I_0\\,e^{-\\alpha z}",
+   "d": [
+    "I_0\\,e^{-\\alpha/z}",
+    "I_0\\,(1 - \\alpha z)",
+    "I_0\\,e^{-2\\alpha z}"
+   ],
+   "h": "α, coefficiente di assorbimento, dipende dal materiale.",
+   "id": "7.14"
+  },
+  {
+   "c": 7,
+   "n": "Attenuazione in dB",
+   "q": "Attenuazione geometrica più assorbimento, in decibel",
+   "t": "L = L(r) - \\beta\\,r,\\qquad \\beta = @@",
+   "a": "10\\log_{10}(e)\\cdot\\alpha",
+   "d": [
+    "\\alpha",
+    "20\\log_{10}(e)\\cdot\\alpha",
+    "\\frac{\\alpha}{10\\log_{10}(e)}"
+   ],
+   "h": "Qui β è un'attenuazione in dB/m, non il modulo di compressibilità.",
+   "id": "7.15"
+  },
+  {
+   "c": 7,
+   "n": "Canna aperta–aperta",
+   "q": "Canna aperta–aperta (o chiusa–chiusa): lunghezze d'onda e frequenze",
+   "t": "\\lambda_n = \\frac{2L}{n},\\qquad f_n = @@",
+   "a": "n\\,\\frac{v}{2L}",
+   "d": [
+    "n\\,\\frac{v}{4L}",
+    "n\\,\\frac{2L}{v}",
+    "(2n-1)\\,\\frac{v}{2L}"
+   ],
+   "h": "Estremo aperto = ventre di spostamento, chiuso = nodo. Tra due ventri c'è λ/2.",
+   "id": "7.16"
+  },
+  {
+   "c": 7,
+   "n": "Canna aperta–chiusa",
+   "q": "Canna aperta–chiusa: lunghezze d'onda e frequenze",
+   "t": "\\lambda_m = \\frac{4L}{2m-1},\\qquad f_m = @@",
+   "a": "(2m-1)\\,\\frac{v}{4L}",
+   "d": [
+    "m\\,\\frac{v}{4L}",
+    "(2m-1)\\,\\frac{v}{2L}",
+    "(2m+1)\\,\\frac{v}{2L}"
+   ],
+   "h": "Solo armoniche dispari: tra ventre e nodo c'è λ/4.",
+   "id": "7.17"
+  },
+  {
+   "c": 8,
+   "n": "D'Alembert in 3D",
+   "q": "Equazione di D'Alembert in 3D, con laplaciano e dalembertiano",
+   "t": "\\nabla^2\\psi = @@,\\qquad \\Box\\,\\psi = 0",
+   "a": "\\frac{1}{v^2}\\,\\frac{\\partial^2\\psi}{\\partial t^2}",
+   "d": [
+    "v^2\\,\\frac{\\partial^2\\psi}{\\partial t^2}",
+    "\\frac{1}{v}\\,\\frac{\\partial\\psi}{\\partial t}",
+    "\\frac{1}{v^2}\\,\\frac{\\partial\\psi}{\\partial t}"
+   ],
+   "h": "□ = (1/v²)∂²/∂t² − ∇². Vale per qualunque direzione di propagazione.",
+   "id": "8.1"
+  },
+  {
+   "c": 8,
+   "n": "Onda piana",
+   "q": "Onda piana armonica in 3D con vettore d'onda",
+   "t": "\\psi(\\vec{r},t) = @@",
+   "a": "A\\cos(\\vec{k}\\cdot\\vec{r} - \\omega t)",
+   "d": [
+    "A\\cos(k\\,r - \\omega t)",
+    "\\frac{A}{r}\\cos(\\vec{k}\\cdot\\vec{r} - \\omega t)",
+    "A\\cos(\\vec{k}\\times\\vec{r} - \\omega t)"
+   ],
+   "h": "|k| = 2π/λ. Fronti d'onda: piani perpendicolari a k; ampiezza costante.",
+   "id": "8.2"
+  },
+  {
+   "c": 8,
+   "n": "Dispersione in 3D",
+   "q": "Relazione di dispersione in 3D",
+   "t": "k_x^2 + k_y^2 + k_z^2 = @@",
+   "a": "\\frac{\\omega^2}{v^2}",
+   "d": [
+    "\\frac{v^2}{\\omega^2}",
+    "\\omega^2 v^2",
+    "\\frac{\\omega}{v}"
+   ],
+   "h": "Si ottiene mettendo l'onda piana in D'Alembert 3D.",
+   "id": "8.3"
+  },
+  {
+   "c": 8,
+   "n": "Onda sferica",
+   "q": "Onda sferica: come calano intensità e ampiezza con la distanza",
+   "t": "I(r) = \\frac{I_1\\,r_1^2}{r^2},\\qquad A(r) \\propto @@",
+   "a": "\\frac{1}{r}",
+   "d": [
+    "\\frac{1}{r^2}",
+    "\\frac{1}{\\sqrt{r}}",
+    "e^{-r}"
+   ],
+   "h": "I ∝ A²: l'intensità cala come 1/r², l'ampiezza come 1/r.",
+   "id": "8.4"
+  },
+  {
+   "c": 8,
+   "n": "Laplaciano",
+   "q": "Laplaciano come divergenza del gradiente",
+   "t": "\\nabla^2\\psi = @@",
+   "a": "\\nabla\\cdot\\nabla\\psi = \\frac{\\partial^2\\psi}{\\partial x^2} + \\frac{\\partial^2\\psi}{\\partial y^2} + \\frac{\\partial^2\\psi}{\\partial z^2}",
+   "d": [
+    "\\nabla\\times\\nabla\\psi",
+    "\\left(\\frac{\\partial\\psi}{\\partial x} + \\frac{\\partial\\psi}{\\partial y} + \\frac{\\partial\\psi}{\\partial z}\\right)^2",
+    "\\nabla\\cdot\\nabla\\psi = \\frac{\\partial^2\\psi}{\\partial x\\,\\partial y} + \\frac{\\partial^2\\psi}{\\partial y\\,\\partial z} + \\frac{\\partial^2\\psi}{\\partial z\\,\\partial x}"
+   ],
+   "h": "Gradiente: da scalare a vettore. Divergenza: da vettore a scalare.",
+   "id": "8.5"
+  },
+  {
+   "c": 9,
+   "n": "Doppler generale",
+   "q": "Effetto Doppler nel caso generale, ascoltatore e sorgente in moto",
+   "t": "f' = f\\,@@",
+   "a": "\\frac{c \\pm v_A}{c \\mp v_S}",
+   "d": [
+    "\\frac{c \\mp v_S}{c \\pm v_A}",
+    "\\frac{c \\pm v_S}{c \\mp v_A}",
+    "\\frac{c \\pm v_A}{c \\pm v_S}"
+   ],
+   "h": "Segni in alto quando si avvicinano. Avvicinarsi alza sempre la frequenza.",
+   "id": "9.1"
+  },
+  {
+   "c": 9,
+   "n": "Ascoltatore in moto",
+   "q": "Doppler con ascoltatore in moto e sorgente ferma",
+   "t": "f' = @@",
+   "a": "f\\,\\frac{c \\pm v_A}{c}",
+   "d": [
+    "f\\,\\frac{c}{c \\mp v_A}",
+    "f\\,\\frac{c}{c \\pm v_A}",
+    "f\\,\\frac{c \\pm v_A}{v_A}"
+   ],
+   "h": "+ se si avvicina. λ non cambia, cambia la velocità relativa c ± v_A.",
+   "id": "9.2"
+  },
+  {
+   "c": 9,
+   "n": "Sorgente in moto",
+   "q": "Doppler con sorgente in moto e ascoltatore fermo",
+   "t": "f' = @@",
+   "a": "f\\,\\frac{c}{c \\mp v_S}",
+   "d": [
+    "f\\,\\frac{c \\pm v_S}{c}",
+    "f\\,\\frac{c}{c \\pm v_S}",
+    "f\\,\\frac{c \\mp v_S}{c}"
+   ],
+   "h": "− al denominatore se si avvicina: i fronti si schiacciano, λ′ = (c − v_S)T.",
+   "id": "9.3"
+  },
+  {
+   "c": 9,
+   "n": "Casi limite Doppler",
+   "q": "Ascoltatore che si avvicina a velocità c; sorgente che si avvicina a velocità c",
+   "t": "v_A = c:\\ f' = @@;\\qquad v_S = c:\\ f' \\to \\infty",
+   "a": "2f",
+   "d": [
+    "\\infty",
+    "\\frac{f}{2}",
+    "0"
+   ],
+   "h": "La sorgente a velocità c schiaccia i fronti: λ′ → 0.",
+   "id": "9.4"
+  },
+  {
+   "c": 9,
+   "n": "Cono di Mach",
+   "q": "Semiapertura del cono di Mach quando v_S > c",
+   "t": "\\sin\\theta = @@",
+   "a": "\\frac{c}{v_S}",
+   "d": [
+    "\\frac{v_S}{c}",
+    "\\frac{c}{v_S + c}",
+    "\\frac{v_S - c}{v_S}"
+   ],
+   "h": "Boom sonico. Stesso principio dell'effetto Cherenkov.",
+   "id": "9.5"
+  },
+  {
+   "c": 10,
+   "n": "Somma di due onde",
+   "q": "Somma di due onde uguali sfasate di φ",
+   "t": "A_0\\cos(kx - \\omega t) + A_0\\cos(kx - \\omega t + \\varphi) = @@",
+   "a": "2A_0\\cos\\frac{\\varphi}{2}\\,\\cos\\left(kx - \\omega t + \\frac{\\varphi}{2}\\right)",
+   "d": [
+    "2A_0\\cos\\varphi\\,\\cos\\left(kx - \\omega t + \\frac{\\varphi}{2}\\right)",
+    "A_0\\cos\\frac{\\varphi}{2}\\,\\cos\\left(kx - \\omega t + \\frac{\\varphi}{2}\\right)",
+    "2A_0\\cos\\frac{\\varphi}{2}\\,\\cos\\left(kx - \\omega t + \\varphi\\right)"
+   ],
+   "h": "L'ampiezza risultante è 2A₀cos(φ/2).",
+   "id": "10.1"
+  },
+  {
+   "c": 10,
+   "n": "Fase e cammino ottico",
+   "q": "Legame tra fase e differenza di cammino ottico",
+   "t": "\\varphi = @@",
+   "a": "\\frac{2\\pi}{\\lambda}\\,\\Delta\\ell = k\\,\\Delta\\ell",
+   "d": [
+    "\\frac{\\lambda}{2\\pi}\\,\\Delta\\ell",
+    "\\frac{\\Delta\\ell}{\\lambda}",
+    "2\\pi\\,\\lambda\\,\\Delta\\ell"
+   ],
+   "h": "Δℓ = nλ costruttiva, Δℓ = (2n + 1)λ/2 distruttiva.",
+   "id": "10.2"
+  },
+  {
+   "c": 10,
+   "n": "Intensità di due onde",
+   "q": "Intensità della somma di due onde sfasate (I₀ = singola onda)",
+   "t": "I = @@",
+   "a": "4I_0\\cos^2\\frac{\\varphi}{2}",
+   "d": [
+    "2I_0\\cos^2\\frac{\\varphi}{2}",
+    "4I_0\\cos^2\\varphi",
+    "4I_0\\cos\\frac{\\varphi}{2}"
+   ],
+   "h": "Massimo 4I₀, non 2I₀: l'intensità va col quadrato dell'ampiezza.",
+   "id": "10.3"
+  },
+  {
+   "c": 10,
+   "n": "Costruttiva e distruttiva",
+   "q": "Condizioni sul cammino per interferenza costruttiva e distruttiva",
+   "t": "\\text{costruttiva: } \\Delta\\ell = n\\lambda,\\qquad \\text{distruttiva: } \\Delta\\ell = @@",
+   "a": "\\frac{2n+1}{2}\\,\\lambda",
+   "d": [
+    "2n\\,\\lambda",
+    "\\frac{n}{2}\\,\\lambda",
+    "(n+1)\\,\\lambda"
+   ],
+   "h": "n = 0, 1, 2, … In fase φ = 2nπ, in controfase φ = (2n + 1)π.",
+   "id": "10.4"
+  },
+  {
+   "c": 10,
+   "n": "Young: differenza di cammino",
+   "q": "Esperimento di Young: differenza di cammino e fase tra le due fenditure",
+   "t": "\\Delta r = @@,\\qquad \\varphi = k\\,\\Delta r",
+   "a": "d\\sin\\theta",
+   "d": [
+    "d\\cos\\theta",
+    "\\frac{d}{\\sin\\theta}",
+    "r\\sin\\theta"
+   ],
+   "h": "Schermo lontano: r ≫ d, raggi quasi paralleli, θ ≈ x/r.",
+   "id": "10.5"
+  },
+  {
+   "c": 10,
+   "n": "Young: intensità",
+   "q": "Esperimento di Young: intensità sullo schermo in funzione di θ",
+   "t": "I(\\theta) = I_0\\cos^2\\left(@@\\right)",
+   "a": "\\frac{\\pi d\\sin\\theta}{\\lambda}",
+   "d": [
+    "\\frac{2\\pi d\\sin\\theta}{\\lambda}",
+    "\\frac{\\pi a\\sin\\theta}{\\lambda}",
+    "\\frac{\\pi\\lambda\\sin\\theta}{d}"
+   ],
+   "h": "Qui I₀ = I(0) è già il massimo centrale. L'argomento è kd sin θ/2.",
+   "id": "10.6"
+  },
+  {
+   "c": 10,
+   "n": "Young: massimi",
+   "q": "Esperimento di Young: posizione dei massimi sullo schermo",
+   "t": "d\\sin\\theta = n\\lambda,\\qquad x_{max} = @@",
+   "a": "n\\,\\frac{\\lambda\\,r}{d}",
+   "d": [
+    "n\\,\\frac{d\\,r}{\\lambda}",
+    "n\\,\\frac{\\lambda\\,d}{r}",
+    "\\left(n + \\tfrac12\\right)\\frac{\\lambda\\,r}{d}"
+   ],
+   "h": "Spaziatura Δx = rλ/d, da cui si misura λ = Δx·d/r.",
+   "id": "10.7"
+  },
+  {
+   "c": 10,
+   "n": "Young: minimi",
+   "q": "Esperimento di Young: condizione per i minimi",
+   "t": "d\\sin\\theta = @@",
+   "a": "\\left(n + \\tfrac12\\right)\\lambda",
+   "d": [
+    "n\\lambda",
+    "\\frac{n\\lambda}{2}",
+    "(2n+1)\\,\\lambda"
+   ],
+   "h": "Primo minimo sin θ = λ/(2d): esiste solo se d ≥ λ/2.",
+   "id": "10.8"
+  },
+  {
+   "c": 11,
+   "n": "Fenditura singola",
+   "q": "Diffrazione da una fenditura di larghezza a: intensità",
+   "t": "I(\\theta) = I_0\\,\\mathrm{sinc}^2\\left(@@\\right)",
+   "a": "\\frac{\\pi a\\sin\\theta}{\\lambda}",
+   "d": [
+    "\\frac{2\\pi a\\sin\\theta}{\\lambda}",
+    "\\frac{\\pi\\lambda\\sin\\theta}{a}",
+    "\\frac{\\pi d\\sin\\theta}{\\lambda}"
+   ],
+   "h": "L'argomento è ka sin θ/2. In ampiezza: E₀ sinc(…).",
+   "id": "11.1"
+  },
+  {
+   "c": 11,
+   "n": "Minimi della fenditura",
+   "q": "Fenditura singola: posizione dei minimi",
+   "t": "a\\sin\\theta = @@",
+   "a": "n\\lambda,\\quad n = \\pm1, \\pm2, \\dots",
+   "d": [
+    "\\left(n + \\tfrac12\\right)\\lambda",
+    "n\\lambda,\\quad n = 0, \\pm1, \\pm2, \\dots",
+    "\\frac{n\\lambda}{2}"
+   ],
+   "h": "n ≠ 0: θ = 0 è il massimo centrale. Il primo minimo esiste solo se a ≥ λ.",
+   "id": "11.2"
+  },
+  {
+   "c": 11,
+   "n": "Apertura rettangolare",
+   "q": "Diffrazione da un'apertura rettangolare a × b",
+   "t": "I(\\theta_a,\\theta_b) = I_0\\,@@",
+   "a": "\\mathrm{sinc}^2\\left(\\frac{ka}{2}\\sin\\theta_a\\right)\\mathrm{sinc}^2\\left(\\frac{kb}{2}\\sin\\theta_b\\right)",
+   "d": [
+    "\\mathrm{sinc}^2\\left(\\frac{ka}{2}\\sin\\theta_a\\right) + \\mathrm{sinc}^2\\left(\\frac{kb}{2}\\sin\\theta_b\\right)",
+    "\\mathrm{sinc}^2\\left(\\frac{k(a+b)}{2}\\sin\\theta\\right)",
+    "\\mathrm{sinc}\\left(\\frac{ka}{2}\\sin\\theta_a\\right)\\mathrm{sinc}\\left(\\frac{kb}{2}\\sin\\theta_b\\right)"
+   ],
+   "h": "Prodotto delle figure delle due fenditure.",
+   "id": "11.3"
+  },
+  {
+   "c": 11,
+   "n": "Disco di Airy",
+   "q": "Apertura circolare di diametro D: intensità (disco di Airy)",
+   "t": "I(\\theta) = I_0\\left[@@\\right]^2",
+   "a": "\\frac{2J_1\\left(\\frac{kD}{2}\\sin\\theta\\right)}{\\frac{kD}{2}\\sin\\theta}",
+   "d": [
+    "\\frac{J_1\\left(\\frac{kD}{2}\\sin\\theta\\right)}{\\frac{kD}{2}\\sin\\theta}",
+    "\\frac{2J_1\\left(kD\\sin\\theta\\right)}{kD\\sin\\theta}",
+    "\\frac{2J_0\\left(\\frac{kD}{2}\\sin\\theta\\right)}{\\frac{kD}{2}\\sin\\theta}"
+   ],
+   "h": "J₁ è la Bessel di ordine 1. Zeri a (kD/2) sin θ = 3,832; 7,016; 10,173.",
+   "id": "11.4"
+  },
+  {
+   "c": 11,
+   "n": "Criterio di Rayleigh",
+   "q": "Minimo angolo risolvibile da un'apertura circolare (Rayleigh)",
+   "t": "\\theta_R \\simeq @@",
+   "a": "1{,}22\\,\\frac{\\lambda}{D}",
+   "d": [
+    "1{,}22\\,\\frac{D}{\\lambda}",
+    "\\frac{\\lambda}{D}",
+    "3{,}832\\,\\frac{\\lambda}{D}"
+   ],
+   "h": "Da (kD/2) sin θ = 3,832. D più grande, risoluzione migliore.",
+   "id": "11.5"
+  },
+  {
+   "c": 11,
+   "n": "Risoluzione lineare",
+   "q": "Risoluzione lineare sul rivelatore (focale f, apertura D)",
+   "t": "x = @@",
+   "a": "1{,}22\\,\\frac{\\lambda f}{D}",
+   "d": [
+    "1{,}22\\,\\frac{\\lambda D}{f}",
+    "1{,}22\\,\\frac{f}{\\lambda D}",
+    "\\frac{\\lambda f}{2D}"
+   ],
+   "h": "f/D è il rapporto focale (f-number). Reflex f/1,8 a 500 nm: circa 1 μm.",
+   "id": "11.6"
+  },
+  {
+   "c": 11,
+   "n": "Doppia fenditura",
+   "q": "Doppia fenditura (larghezza a, distanza d): intensità",
+   "t": "I(\\theta) = 4I_0'\\,@@",
+   "a": "\\mathrm{sinc}^2\\left(\\frac{\\pi a\\sin\\theta}{\\lambda}\\right)\\cos^2\\left(\\frac{\\pi d\\sin\\theta}{\\lambda}\\right)",
+   "d": [
+    "\\mathrm{sinc}^2\\left(\\frac{\\pi d\\sin\\theta}{\\lambda}\\right)\\cos^2\\left(\\frac{\\pi a\\sin\\theta}{\\lambda}\\right)",
+    "\\mathrm{sinc}^2\\left(\\frac{\\pi a\\sin\\theta}{\\lambda}\\right) + \\cos^2\\left(\\frac{\\pi d\\sin\\theta}{\\lambda}\\right)",
+    "\\mathrm{sinc}\\left(\\frac{\\pi a\\sin\\theta}{\\lambda}\\right)\\cos\\left(\\frac{\\pi d\\sin\\theta}{\\lambda}\\right)"
+   ],
+   "h": "Diffrazione (a) per interferenza (d). Massimi d sin θ = nλ, minimi di diffrazione a sin θ = mλ.",
+   "id": "11.7"
+  },
+  {
+   "c": 11,
+   "n": "N sorgenti coerenti",
+   "q": "Interferenza di N sorgenti coerenti: intensità",
+   "t": "I(\\theta) = I_0\\left[@@\\right]^2",
+   "a": "\\frac{\\sin\\left(\\frac{N\\pi d\\sin\\theta}{\\lambda}\\right)}{\\sin\\left(\\frac{\\pi d\\sin\\theta}{\\lambda}\\right)}",
+   "d": [
+    "\\frac{\\sin\\left(\\frac{N\\pi d\\sin\\theta}{\\lambda}\\right)}{\\frac{\\pi d\\sin\\theta}{\\lambda}}",
+    "\\frac{\\sin\\left(\\frac{\\pi d\\sin\\theta}{\\lambda}\\right)}{\\sin\\left(\\frac{N\\pi d\\sin\\theta}{\\lambda}\\right)}",
+    "\\frac{\\sin\\left(\\frac{N\\pi a\\sin\\theta}{\\lambda}\\right)}{\\sin\\left(\\frac{\\pi a\\sin\\theta}{\\lambda}\\right)}"
+   ],
+   "h": "Massimi principali I = N²I₀. Con N = 2 si ritrova Young.",
+   "id": "11.8"
+  },
+  {
+   "c": 11,
+   "n": "N sorgenti: minimi",
+   "q": "N sorgenti: massimi principali, loro intensità e minimi",
+   "t": "\\text{max: } d\\sin\\theta = n\\lambda,\\ I = N^2 I_0;\\qquad \\text{min: } d\\sin\\theta = @@",
+   "a": "\\frac{n'\\lambda}{N},\\ \\ n' \\neq 0, N, 2N, \\dots",
+   "d": [
+    "\\frac{n'\\lambda}{N},\\ \\ n' = 0, 1, 2, \\dots",
+    "\\frac{n'\\lambda}{2N}",
+    "n'\\,N\\lambda"
+   ],
+   "h": "Tra due massimi principali: N − 1 minimi e N − 2 massimi secondari.",
+   "id": "11.9"
+  },
+  {
+   "c": 11,
+   "n": "Reticolo: intensità",
+   "q": "Reticolo di N fenditure (larghezza a, passo d): intensità",
+   "t": "I(\\theta) = I_{01}\\,@@",
+   "a": "\\mathrm{sinc}^2\\left(\\frac{\\pi a\\sin\\theta}{\\lambda}\\right)\\left[\\frac{\\sin\\left(\\frac{N\\pi d\\sin\\theta}{\\lambda}\\right)}{\\sin\\left(\\frac{\\pi d\\sin\\theta}{\\lambda}\\right)}\\right]^2",
+   "d": [
+    "\\mathrm{sinc}^2\\left(\\frac{\\pi d\\sin\\theta}{\\lambda}\\right)\\left[\\frac{\\sin\\left(\\frac{N\\pi a\\sin\\theta}{\\lambda}\\right)}{\\sin\\left(\\frac{\\pi a\\sin\\theta}{\\lambda}\\right)}\\right]^2",
+    "\\mathrm{sinc}^2\\left(\\frac{N\\pi a\\sin\\theta}{\\lambda}\\right)\\cos^2\\left(\\frac{\\pi d\\sin\\theta}{\\lambda}\\right)",
+    "N\\,\\mathrm{sinc}^2\\left(\\frac{\\pi a\\sin\\theta}{\\lambda}\\right)\\cos^2\\left(\\frac{N\\pi d\\sin\\theta}{\\lambda}\\right)"
+   ],
+   "h": "Inviluppo di diffrazione per interferenza di N sorgenti. Picco centrale N²I₀₁.",
+   "id": "11.10"
+  },
+  {
+   "c": 11,
+   "n": "Reticolo: ordini",
+   "q": "Reticolo: posizione dei massimi principali di ordine n",
+   "t": "\\sin\\theta_n = @@",
+   "a": "\\frac{n\\lambda}{d}",
+   "d": [
+    "\\frac{n\\lambda}{N d}",
+    "\\frac{n\\,d}{\\lambda}",
+    "\\frac{n\\lambda}{a}"
+   ],
+   "h": "sin θ ∝ λ: il rosso è deviato più del blu, al contrario del prisma.",
+   "id": "11.11"
+  },
+  {
+   "c": 11,
+   "n": "Dispersione del reticolo",
+   "q": "Dispersione angolare di un reticolo",
+   "t": "D = \\frac{d\\theta}{d\\lambda} = @@",
+   "a": "\\frac{n}{d\\cos\\theta}",
+   "d": [
+    "\\frac{n}{d\\sin\\theta}",
+    "\\frac{d\\cos\\theta}{n}",
+    "\\frac{nN}{d\\cos\\theta}"
+   ],
+   "h": "Aumenta con l'ordine n.",
+   "id": "11.12"
+  },
+  {
+   "c": 11,
+   "n": "Larghezza dei massimi",
+   "q": "Semilarghezza dei massimi di ordine n di un reticolo",
+   "t": "\\Delta\\theta_{HW} = @@",
+   "a": "\\frac{\\lambda}{N d\\cos\\theta}",
+   "d": [
+    "\\frac{N\\lambda}{d\\cos\\theta}",
+    "\\frac{\\lambda}{d\\cos\\theta}",
+    "\\frac{\\lambda}{N d\\sin\\theta}"
+   ],
+   "h": "= λD/(nN). Al centro vale λ/(Nd). Per ordini alti non si può usare sin θ ≈ θ.",
+   "id": "11.13"
+  },
+  {
+   "c": 11,
+   "n": "Potere risolutivo",
+   "q": "Potere risolutivo di un reticolo",
+   "t": "R = \\frac{\\lambda}{\\Delta\\lambda} = @@",
+   "a": "n\\,N",
+   "d": [
+    "\\frac{N}{n}",
+    "N",
+    "\\frac{n\\,N}{d}"
+   ],
+   "h": "Più fenditure e ordini più alti danno risoluzione migliore.",
+   "id": "11.14"
+  },
+  {
+   "c": 12,
+   "n": "Indice di rifrazione",
+   "q": "Indice di rifrazione, nelle tre forme",
+   "t": "n = \\frac{c}{v} = @@",
+   "a": "\\frac{k}{k_0} = \\frac{\\lambda_0}{\\lambda}",
+   "d": [
+    "\\frac{k_0}{k} = \\frac{\\lambda}{\\lambda_0}",
+    "\\frac{k}{k_0} = \\frac{\\lambda}{\\lambda_0}",
+    "\\frac{\\omega}{\\omega_0} = \\frac{\\lambda_0}{\\lambda}"
+   ],
+   "h": "ω non cambia tra i mezzi; cambiano v, k, λ. Aria 1,0003, acqua 1,33, vetro 1,5, diamante 2,4.",
+   "id": "12.1"
+  },
+  {
+   "c": 12,
+   "n": "Velocità della luce",
+   "q": "Velocità della luce dalle equazioni di Maxwell",
+   "t": "c = @@",
+   "a": "\\frac{1}{\\sqrt{\\mu_0\\,\\varepsilon_0}}",
+   "d": [
+    "\\sqrt{\\mu_0\\,\\varepsilon_0}",
+    "\\frac{1}{\\mu_0\\,\\varepsilon_0}",
+    "\\sqrt{\\frac{\\mu_0}{\\varepsilon_0}}"
+   ],
+   "h": "E e B obbediscono all'equazione di D'Alembert.",
+   "id": "12.2"
+  },
+  {
+   "c": 12,
+   "n": "Snell–Cartesio",
+   "q": "Legge di Snell–Cartesio per la rifrazione",
+   "t": "n_1\\sin\\theta_i = @@",
+   "a": "n_2\\sin\\theta_t",
+   "d": [
+    "n_2\\cos\\theta_t",
+    "n_1\\sin\\theta_t",
+    "\\frac{\\sin\\theta_t}{n_2}"
+   ],
+   "h": "Riflessione: θ_i = θ_r. Se n₂ > n₁ il raggio si avvicina alla normale.",
+   "id": "12.3"
+  },
+  {
+   "c": 12,
+   "n": "Angolo critico",
+   "q": "Angolo critico per la riflessione totale",
+   "t": "\\sin\\theta_c = @@\\qquad (n_2 < n_1)",
+   "a": "\\frac{n_2}{n_1}",
+   "d": [
+    "\\frac{n_1}{n_2}",
+    "n_1 - n_2",
+    "\\frac{1}{n_1}"
+   ],
+   "h": "Esiste solo passando dal mezzo più denso al meno denso (fibre ottiche).",
+   "id": "12.4"
+  },
+  {
+   "c": 12,
+   "n": "Finestra di Snell",
+   "q": "Sott'acqua: angolo massimo di trasmissione e apertura del cono di luce",
+   "t": "\\theta_t^{max} = \\arcsin\\frac{1}{1{,}334} \\simeq 48{,}6^\\circ,\\qquad \\alpha = @@",
+   "a": "2\\,\\theta_t^{max} \\simeq 97^\\circ",
+   "d": [
+    "\\theta_t^{max} \\simeq 48{,}6^\\circ",
+    "180^\\circ - \\theta_t^{max} \\simeq 131^\\circ",
+    "2\\,\\theta_t^{max} \\simeq 180^\\circ"
+   ],
+   "h": "Da sott'acqua vedi tutto il cielo in un cerchio luminoso di apertura ≈ 97°.",
+   "id": "12.5"
+  },
+  {
+   "c": 12,
+   "n": "Principio di Fermat",
+   "q": "Tempo di percorrenza tra S (altezza h) e P (profondità b) attraverso due mezzi",
+   "t": "t(x) = @@",
+   "a": "\\frac{\\sqrt{h^2 + x^2}}{v_1} + \\frac{\\sqrt{b^2 + (a - x)^2}}{v_2}",
+   "d": [
+    "\\frac{\\sqrt{h^2 + x^2}}{v_2} + \\frac{\\sqrt{b^2 + (a - x)^2}}{v_1}",
+    "v_1\\sqrt{h^2 + x^2} + v_2\\sqrt{b^2 + (a - x)^2}",
+    "\\frac{h + x}{v_1} + \\frac{b + a - x}{v_2}"
+   ],
+   "h": "dt/dx = 0 dà Snell. Forma variazionale: δ∫n ds = 0.",
+   "id": "12.6"
+  },
+  {
+   "c": 12,
+   "n": "Diottro sferico",
+   "q": "Formula del diottro sferico (Cartesio per la rifrazione)",
+   "t": "\\frac{n_1}{p} + \\frac{n_2}{q} = @@",
+   "a": "\\frac{n_2 - n_1}{r}",
+   "d": [
+    "\\frac{n_1 - n_2}{r}",
+    "\\frac{n_2 + n_1}{r}",
+    "\\frac{n_2 - n_1}{2r}"
+   ],
+   "h": "n₁ è il mezzo dell'oggetto. r > 0 se l'oggetto vede la faccia convessa.",
+   "id": "12.7"
+  },
+  {
+   "c": 12,
+   "n": "Fuochi del diottro",
+   "q": "Distanze focali del diottro: fuoco oggetto f₀ e fuoco immagine f_i",
+   "t": "f_0 = \\frac{n_1}{n_2 - n_1}\\,r,\\qquad f_i = @@",
+   "a": "\\frac{n_2}{n_2 - n_1}\\,r",
+   "d": [
+    "\\frac{n_1}{n_2 - n_1}\\,r",
+    "\\frac{n_2 - n_1}{n_2}\\,r",
+    "\\frac{n_2}{n_1 - n_2}\\,r"
+   ],
+   "h": "f_i − f₀ = r e n₁/f₀ = n₂/f_i.",
+   "id": "12.8"
+  },
+  {
+   "c": 12,
+   "n": "Specchio sferico",
+   "q": "Formula dello specchio sferico",
+   "t": "\\frac{1}{p} + \\frac{1}{q} = @@ = \\frac{1}{f}",
+   "a": "\\frac{2}{r}",
+   "d": [
+    "\\frac{1}{r}",
+    "\\frac{1}{2r}",
+    "\\frac{r}{2}"
+   ],
+   "h": "f = r/2. Concavo r > 0 (immagine reale), convesso r < 0 (virtuale), piano r → ∞.",
+   "id": "12.9"
+  },
+  {
+   "c": 12,
+   "n": "Costruttore di lenti",
+   "q": "Equazione del costruttore di lenti",
+   "t": "\\frac{1}{f} = @@",
+   "a": "(n - 1)\\left(\\frac{1}{r_1} - \\frac{1}{r_2}\\right)",
+   "d": [
+    "(n - 1)\\left(\\frac{1}{r_1} + \\frac{1}{r_2}\\right)",
+    "n\\left(\\frac{1}{r_1} - \\frac{1}{r_2}\\right)",
+    "(n + 1)\\left(\\frac{1}{r_1} - \\frac{1}{r_2}\\right)"
+   ],
+   "h": "Lente sottile = due diottri in successione, spessore trascurabile.",
+   "id": "12.10"
+  },
+  {
+   "c": 12,
+   "n": "Lente sottile",
+   "q": "Formula delle lenti sottili",
+   "t": "@@ = \\frac{1}{f}",
+   "a": "\\frac{1}{p} + \\frac{1}{q}",
+   "d": [
+    "\\frac{1}{p} - \\frac{1}{q}",
+    "\\frac{1}{p\\,q}",
+    "p + q"
+   ],
+   "h": "f > 0 lente convergente, f < 0 divergente. Il raggio per il centro non è deviato.",
+   "id": "12.11"
+  },
+  {
+   "c": 12,
+   "n": "Ingrandimento: specchio",
+   "q": "Ingrandimento di uno specchio",
+   "t": "M = @@",
+   "a": "-\\frac{q}{p}",
+   "d": [
+    "\\frac{q}{p}",
+    "-\\frac{p}{q}",
+    "-\\frac{n_1\\,q}{n_2\\,p}"
+   ],
+   "h": "M > 0 immagine dritta, M < 0 capovolta.",
+   "id": "12.12"
+  },
+  {
+   "c": 12,
+   "n": "Ingrandimento: diottro",
+   "q": "Ingrandimento di un diottro",
+   "t": "M = @@",
+   "a": "-\\frac{n_1\\,q}{n_2\\,p}",
+   "d": [
+    "-\\frac{n_2\\,q}{n_1\\,p}",
+    "-\\frac{q}{p}",
+    "\\frac{n_1\\,q}{n_2\\,p}"
+   ],
+   "h": "Viene da sin θ_t / sin θ_i = n₁/n₂.",
+   "id": "12.13"
+  }
+ ]
+};
+const CH = DATA.chapters;
+const CARDS = DATA.cards;
+const BY_ID = Object.fromEntries(CARDS.map(c => [c.id, c]));
+const KEY = "onde-formule-v1";
+const DAY = 864e5;
+const IV = [0, DAY, 2 * DAY, 4 * DAY, 7 * DAY, 14 * DAY];
+const RANKS = ["Molla a riposo", "Piccole oscillazioni", "Oscillatore smorzato", "Forzante in fase", "In risonanza",
+  "Modo normale", "Onda stazionaria", "Fronte d'onda", "Interferenza costruttiva", "Reticolo di diffrazione", "Disco di Airy", "Maestro di D'Alembert"];
+const XP_PER_LEVEL = 250;
+const HL = n => "h" + (((n - 1) % 5) + 1) + "c";
+
+/* ---------- utilità ---------- */
+const esc = s => String(s).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const fill = (c, piece) => c.t.split("@@").join(piece);
+const full = c => fill(c, c.a);
+const clozeTex = c => fill(c, "\\boxed{\\;?\\;}");
+const today = (offset = 0) => new Date(Date.now() + offset).toLocaleDateString("sv-SE");
+
+/* ---------- stato ---------- */
+function blank() { return { v: 1, updatedAt: 0, xp: 0, streak: { n: 0, last: "" }, best: { lampo: 0 }, cards: {} }; }
+function loadState() {
+  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.v === 1) return Object.assign(blank(), s); } catch (e) {}
+  return blank();
+}
+let S = loadState();
+function save() {
+  S.updatedAt = Date.now();
+  try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {}
+  Sync.schedule();
+}
+const cs = id => S.cards[id] || { b: 0, due: 0, s: 0, r: 0, w: 0, seen: 0 };
+const isSeen = id => !!(S.cards[id] && S.cards[id].seen);
+const isDue = (id, now) => isSeen(id) && S.cards[id].due <= now;
+
+function touchStreak() {
+  const t = today();
+  if (S.streak.last === t) return;
+  S.streak.n = S.streak.last === today(-DAY) ? S.streak.n + 1 : 1;
+  S.streak.last = t;
+}
+/* kind: rec (riconoscere), mem (a memoria), lampo, study. res: ok | quasi | no */
+function grade(id, kind, res) {
+  const x = Object.assign({ b: 0, due: 0, s: 0, r: 0, w: 0, seen: 0 }, S.cards[id]);
+  const now = Date.now();
+  x.seen = 1;
+  if (kind === "study") { x.due = now; }
+  else if (kind === "lampo") {
+    if (res === "no") { x.b = Math.max(0, x.b - 1); x.due = now; x.w++; } else { x.r++; }
+    x.s++;
+  } else {
+    x.s++;
+    if (res === "ok") {
+      x.r++;
+      if (kind === "mem") x.b = Math.min(5, x.b + 1);
+      else if (x.b < 3) x.b = x.b + 1;
+      x.due = now + IV[x.b];
+    } else if (res === "quasi") {
+      x.b = Math.max(1, Math.min(x.b, 2)); x.due = now + IV[1];
+    } else {
+      x.w++; x.b = 0; x.due = now;
+    }
+  }
+  S.cards[id] = x;
+  touchStreak();
+}
+function mastery(list) {
+  list = list || CARDS;
+  let sum = 0; for (const c of list) sum += cs(c.id).b;
+  return sum / (5 * list.length);
+}
+const level = () => Math.floor(S.xp / XP_PER_LEVEL);
+const rankName = l => RANKS[Math.min(l, RANKS.length - 1)];
+
+/* ---------- salvataggio nel tuo account (se disponibile) ---------- */
+const Sync = {
+  ref: null, busy: false, dirty: false, timer: 0, cloud: false,
+  async init() {
+    try {
+      const cl = window.claude;
+      if (!cl || typeof cl.use !== "function") return;
+      const [db, user] = await Promise.all([cl.use("db"), cl.use("user")]);
+      if (!db || !user) return;
+      const id = await user.id();
+      if (!id) return;
+      const ref = db.doc("data/users/" + id + "/progress");
+      const snap = await Promise.race([ref.get(), new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), 10000))]);
+      this.ref = ref;
+      const remote = snap && snap.exists ? snap.data() : null;
+      const rs = remote && remote.state;
+      if (rs && rs.v === 1 && (rs.updatedAt || 0) > (S.updatedAt || 0)) {
+        S = Object.assign(blank(), JSON.parse(JSON.stringify(rs)));
+        try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {}
+        if (VIEW.name === "home" || VIEW.name === "chapter") render();
+        renderTop();
+      } else if (S.updatedAt > 0 && (!rs || (rs.updatedAt || 0) < S.updatedAt)) {
+        this.schedule(0);
+      }
+      this.cloud = true;
+      const el = document.getElementById("syncnote"); if (el) el.textContent = syncText();
+    } catch (e) { this.ref = null; }
+  },
+  schedule(delay = 1500) {
+    if (!this.ref) return;
+    this.dirty = true; clearTimeout(this.timer);
+    this.timer = setTimeout(() => this.flush(), delay);
+  },
+  async flush() {
+    if (!this.ref || this.busy || !this.dirty) return;
+    this.busy = true; this.dirty = false;
+    try { await this.ref.set({ state: JSON.parse(JSON.stringify(S)) }); }
+    catch (e) {
+      const code = e && e.code;
+      if (code === "unavailable" || code === "resource_exhausted") { this.dirty = true; setTimeout(() => this.flush(), 2500 + Math.random() * 2500); }
+      else { this.ref = null; this.cloud = false; }
+    }
+    this.busy = false;
+    if (this.dirty && this.ref) this.schedule();
+  }
+};
+const syncText = () => Sync.cloud ? "Progressi salvati nel tuo account Claude." : "Progressi salvati in questo browser.";
+
+/* ---------- formule ---------- */
+function renderTex(el) {
+  const src = el.getAttribute("data-tex");
+  const display = el.getAttribute("data-inline") === null;
+  if (window.katex) {
+    try { window.katex.render(display ? src : "\\displaystyle " + src, el, { displayMode: display, throwOnError: false, strict: "ignore" }); }
+    catch (e) { el.textContent = src; el.classList.add("raw"); }
+  } else { el.textContent = src; el.classList.add("raw"); }
+}
+function fit(el) {
+  el.style.fontSize = "";
+  let f = 1;
+  while (el.scrollWidth > el.clientWidth + 1 && f > 0.5) { f -= 0.05; el.style.fontSize = f + "em"; }
+}
+function mathAll(root) {
+  const els = root.querySelectorAll("[data-tex]");
+  els.forEach(renderTex);
+  requestAnimationFrame(() => els.forEach(fit));
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => els.forEach(el => el.isConnected && fit(el)));
+}
+const M = (tex, inline) => `<div class="math" data-tex="${esc(tex)}"${inline ? " data-inline" : ""}></div>`;
+
+/* ---------- la corda (combo = modo normale) ---------- */
+const Wave = {
+  cv: null, ctx: null, A: 0.3, target: 0.3, n: 1, t: 0, flash: 0, tone: "good", raf: 0, colors: null,
+  still: window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches,
+  attach(cv) {
+    this.cv = cv; if (!cv) return;
+    this.ctx = cv.getContext("2d");
+    this.readColors(); this.resize();
+    if (this.still) this.draw();
+    else if (!this.raf) this.loop();
+  },
+  readColors() {
+    const cs = getComputedStyle(document.documentElement);
+    const g = n => cs.getPropertyValue(n).trim();
+    this.colors = { ink: g("--ink"), hl: g("--hl-4"), good: g("--good"), bad: g("--bad"), line: g("--ink-2") };
+  },
+  resize() {
+    if (!this.cv) return;
+    const r = this.cv.getBoundingClientRect();
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    this.cv.width = Math.max(1, Math.round(r.width * dpr));
+    this.cv.height = Math.max(1, Math.round(r.height * dpr));
+    this.dpr = dpr;
+  },
+  set(a, n) { this.target = a; this.n = n; if (this.still) this.draw(); },
+  kick(combo) {
+    this.n = combo >= 9 ? 5 : combo >= 6 ? 4 : combo >= 4 ? 3 : combo >= 2 ? 2 : 1;
+    this.A = Math.min(1, this.A + 0.28 + 0.04 * combo); this.flash = 1; this.tone = "good";
+    if (this.still) this.draw();
+  },
+  damp() { this.A *= 0.25; this.n = 1; this.flash = 1; this.tone = "bad"; if (this.still) this.draw(); },
+  loop() {
+    const step = () => {
+      this.t += 1 / 60;
+      this.A += (this.target - this.A) * 0.012;
+      this.flash = Math.max(0, this.flash - 0.025);
+      this.draw();
+      this.raf = requestAnimationFrame(step);
+    };
+    this.raf = requestAnimationFrame(step);
+  },
+  draw() {
+    const cv = this.cv, ctx = this.ctx;
+    if (!cv || !ctx || !cv.isConnected) return;
+    const w = cv.width, h = cv.height, d = this.dpr || 1, C = this.colors;
+    ctx.clearRect(0, 0, w, h);
+    const pad = 12 * d, x0 = pad, x1 = w - pad, mid = h / 2;
+    const amp = (h / 2 - 8 * d) * this.A;
+    const om = 2 * Math.PI * (0.55 + 0.22 * this.n);
+    const ph = this.still ? 1 : Math.cos(om * this.t);
+    const pts = [];
+    for (let i = 0; i <= 160; i++) {
+      const u = i / 160;
+      pts.push([x0 + u * (x1 - x0), mid - amp * Math.sin(this.n * Math.PI * u) * ph]);
+    }
+    const path = () => { ctx.beginPath(); pts.forEach((p, i) => i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])); };
+    ctx.lineCap = "round"; ctx.lineJoin = "round";
+    path(); ctx.strokeStyle = C.hl; ctx.lineWidth = 11 * d; ctx.stroke();
+    if (this.flash > 0) { ctx.globalAlpha = this.flash * 0.8; path(); ctx.strokeStyle = this.tone === "good" ? C.good : C.bad; ctx.lineWidth = 6 * d; ctx.stroke(); ctx.globalAlpha = 1; }
+    path(); ctx.strokeStyle = C.ink; ctx.lineWidth = 2.2 * d; ctx.stroke();
+    ctx.fillStyle = C.ink;
+    for (let k = 0; k <= this.n; k++) {
+      const x = x0 + (k / this.n) * (x1 - x0);
+      ctx.beginPath(); ctx.arc(x, mid, (k === 0 || k === this.n ? 4.5 : 2.6) * d, 0, 2 * Math.PI); ctx.fill();
+    }
+  }
+};
+window.addEventListener("resize", () => { Wave.resize(); if (Wave.still) Wave.draw(); });
+if (window.matchMedia) {
+  const mq = matchMedia("(prefers-color-scheme: dark)");
+  const re = () => setTimeout(() => { Wave.readColors(); if (Wave.still) Wave.draw(); }, 30);
+  if (mq.addEventListener) mq.addEventListener("change", re);
+  new MutationObserver(re).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+}
+
+/* ---------- navigazione ---------- */
+const VIEW = { name: "home", filter: 0, ch: 1 };
+const app = document.getElementById("app");
+function go(name, extra) { Object.assign(VIEW, { name }, extra || {}); render(); window.scrollTo(0, 0); }
+function render() {
+  if (VIEW.name === "home") renderHome();
+  else if (VIEW.name === "chapter") renderChapter();
+  else if (VIEW.name === "session") renderQuestion();
+  else if (VIEW.name === "results") renderResults();
+  else if (VIEW.name === "lampo") renderLampo();
+  else if (VIEW.name === "lampo-end") renderLampoEnd();
+  renderTop();
+}
+function renderTop() {
+  const l = level(), inLvl = S.xp - l * XP_PER_LEVEL;
+  document.getElementById("top").innerHTML = `
+    <div class="top-in">
+      <div class="brand">Onde · formule</div>
+      <div class="lvl">Liv. ${l + 1} <b>${esc(rankName(l))}</b><br>${S.xp} XP</div>
+      <div class="streak" title="Giorni di fila con almeno un ripasso">${S.streak.n} ${S.streak.n === 1 ? "giorno" : "giorni"}</div>
+    </div>
+    <div class="xpbar" aria-hidden="true"><i style="width:${(inLvl / XP_PER_LEVEL * 100).toFixed(1)}%"></i></div>`;
+}
+
+/* ---------- home ---------- */
+function reviewPlan() {
+  const now = Date.now();
+  const due = CARDS.filter(c => isDue(c.id, now)).sort((a, b) => cs(a.id).due - cs(b.id).due);
+  const fresh = CARDS.filter(c => !isSeen(c.id));
+  const dueTake = due.slice(0, 15);
+  const freshTake = fresh.slice(0, Math.max(0, Math.min(5, 15 - dueTake.length)));
+  return { due, fresh, dueTake, freshTake };
+}
+function pipsHtml(list) { return `<span class="pips" aria-hidden="true">${list.map(c => `<i class="pip${isSeen(c.id) ? " b" + cs(c.id).b : ""}"></i>`).join("")}</span>`; }
+
+function renderHome() {
+  const p = reviewPlan();
+  const m = mastery(), pct = Math.round(m * 100);
+  const n = 1 + Math.min(4, Math.floor(m * 5));
+  const nothing = p.dueTake.length + p.freshTake.length === 0;
+  const chips = [0].concat(CH.map((_, i) => i + 1)).map(k =>
+    `<button class="chip" data-act="filter" data-ch="${k}" aria-pressed="${VIEW.filter === k}" title="${k ? esc(CH[k - 1]) : "Tutti i capitoli"}">${k ? k : "Tutti"}</button>`).join("");
+  const rows = CH.map((name, i) => {
+    const list = CARDS.filter(c => c.c === i + 1);
+    return `<li><button class="branch" data-act="chapter" data-ch="${i + 1}">
+      <span class="cn ${HL(i + 1)}">${i + 1}</span>
+      <span class="cname">${esc(name)}${pipsHtml(list)}</span>
+      <span class="pct">${Math.round(mastery(list) * 100)}%</span></button></li>`;
+  }).join("");
+  app.innerHTML = `
+  <section class="hero">
+    <div class="eyebrow">Onde e Oscillazioni · scritto</div>
+    <h1>L'albero <span class="mark">delle formule</span></h1>
+    <div class="wavebox"><canvas id="wave" aria-hidden="true"></canvas>
+      <div class="wave-cap">padronanza ${pct}% · modo n = ${n}</div></div>
+    <div class="today">
+      <div class="today-num">${nothing
+        ? "Per oggi è tutto ripassato. Torna domani, o allenati sotto."
+        : `<b>${p.dueTake.length}</b> da ripassare · <b>${p.freshTake.length}</b> nuove oggi`}</div>
+      <button class="btn primary big" data-act="review">${nothing ? "Ripassa le più deboli" : "Inizia il ripasso"}</button>
+    </div>
+    <button class="btn lampo-btn" data-act="lampo"><span class="lb"><b>Lampo</b><span>giusta o sbagliata? 60 secondi</span></span><span class="rec">record ${S.best.lampo}</span></button>
+  </section>
+  <section>
+    <h2>Allenamento libero</h2>
+    <div class="chips" role="group" aria-label="Capitoli">${chips}</div>
+    <div class="modes">
+      <button class="mode" data-act="free" data-mode="cloze"><b>Completa</b><span>trova il pezzo mancante della formula</span></button>
+      <button class="mode" data-act="free" data-mode="quale"><b>Quale formula?</b><span>quattro versioni della stessa formula, una sola giusta</span></button>
+      <button class="mode" data-act="free" data-mode="memoria"><b>A memoria</b><span>scrivila su carta, poi controlla</span></button>
+    </div>
+  </section>
+  <section>
+    <h2>I dodici rami</h2>
+    <div class="legend"><span><i class="pip"></i>mai vista</span><span><i class="pip b0"></i>da rifare</span><span><i class="pip b2"></i>in corso</span><span><i class="pip b5"></i>padroneggiata</span></div>
+    <ol class="tree">${rows}</ol>
+  </section>
+  <section class="how">
+    <h2>Come funziona</h2>
+    <p>Ogni formula ha sei livelli. Una risposta giusta la fa salire e la rimanda più in là (1, 2, 4, 7, 14 giorni); una sbagliata la riporta a zero e te la ripropone subito. Riconoscerla basta fino al livello 3: gli ultimi due si conquistano solo a memoria. Ogni risposta giusta di fila eccita un modo più alto della corda.</p>
+  </section>
+  <div class="foot"><span id="syncnote">${syncText()}</span><button class="link" data-act="reset" id="resetbtn">Azzera i progressi</button></div>`;
+  Wave.attach(document.getElementById("wave"));
+  Wave.set(0.34 + 0.6 * m, n); Wave.A = Math.max(Wave.A, 0.34 + 0.6 * m);
+}
+
+/* ---------- capitolo ---------- */
+function renderChapter() {
+  const ch = VIEW.ch, list = CARDS.filter(c => c.c === ch);
+  const items = list.map(c => {
+    const x = cs(c.id), on = isSeen(c.id) ? x.b : -1;
+    const pips = [0, 1, 2, 3, 4].map(k => `<i class="${k < on ? "on" : ""}"></i>`).join("");
+    return `<article class="panel fcard">
+      <div class="fcard-top"><h3>${esc(c.n)}</h3><span class="lvpips" title="${on < 0 ? "Mai vista" : "Livello " + on + " di 5"}">${pips}</span></div>
+      ${M(full(c))}
+      <p class="note">${esc(c.h)}</p></article>`;
+  }).join("");
+  app.innerHTML = `
+  <div class="sesbar"><button class="link" data-act="home">← Tutti i rami</button></div>
+  <section>
+    <div class="chhead"><span class="cn ${HL(ch)}">${ch}</span><div><h1 style="font-size:1.9rem">${esc(CH[ch - 1])}</h1>
+      <div class="muted">${list.length} formule · padronanza ${Math.round(mastery(list) * 100)}%</div></div></div>
+    <button class="btn primary big" data-act="train-ch">Allenati su questo ramo</button>
+    <div class="fl">${items}</div>
+  </section>`;
+  mathAll(app);
+}
+
+/* ---------- sessioni ---------- */
+let SES = null;
+function modeFor(id) {
+  const b = cs(id).b;
+  if (!isSeen(id)) return "study";
+  if (b === 0) return "cloze";
+  if (b === 1) return "quale";
+  if (b === 2) return Math.random() < 0.5 ? "cloze" : "memoria";
+  return "memoria";
+}
+function withChecks(base, fresh) {
+  // nuove formule: prima le leggi, poi almeno due domande dopo te le chiedo da completare
+  const main = [], due = shuffle(base);
+  let di = 0;
+  for (const c of fresh) { main.push({ id: c.id, mode: "study" }); if (di < due.length) main.push(due[di++]); }
+  while (di < due.length) main.push(due[di++]);
+  const out = [], pending = [];
+  for (const it of main) {
+    while (pending.length && pending[0].at <= out.length) out.push(pending.shift().item);
+    out.push(it);
+    if (it.mode === "study") pending.push({ at: out.length + 2, item: { id: it.id, mode: "cloze" } });
+  }
+  for (const p of pending) out.push(p.item);
+  return out;
+}
+function startSession(items, title, again) {
+  if (!items.length) return;
+  SES = { items, i: 0, ok: 0, tot: 0, combo: 0, maxCombo: 0, xp: 0, wrong: [], requeued: new Set(), title, again, startLevel: level(), state: "ask" };
+  Wave.A = 0.15; Wave.n = 1;
+  go("session");
+}
+function startReview() {
+  const p = reviewPlan();
+  if (!p.dueTake.length && !p.freshTake.length) return startWeakest();
+  const base = p.dueTake.map(c => ({ id: c.id, mode: modeFor(c.id) }));
+  startSession(withChecks(base, p.freshTake), "Ripasso di oggi", startReview);
+}
+function startWeakest() {
+  const pool = shuffle(CARDS).sort((a, b) => cs(a.id).b - cs(b.id).b || cs(a.id).due - cs(b.id).due).slice(0, 10);
+  const seen = pool.filter(c => isSeen(c.id)).map(c => ({ id: c.id, mode: modeFor(c.id) }));
+  startSession(withChecks(seen, pool.filter(c => !isSeen(c.id))), "Le più deboli", startWeakest);
+}
+function startFree(mode) {
+  const f = VIEW.filter;
+  const pool = CARDS.filter(c => !f || c.c === f);
+  const pickd = shuffle(pool).sort((a, b) => cs(a.id).b - cs(b.id).b).slice(0, 10);
+  startSession(shuffle(pickd).map(c => ({ id: c.id, mode })), "Allenamento", () => startFree(mode));
+}
+function startChapter(ch) {
+  const list = CARDS.filter(c => c.c === ch);
+  const seen = list.filter(c => isSeen(c.id)).map(c => ({ id: c.id, mode: modeFor(c.id) }));
+  startSession(withChecks(seen, list.filter(c => !isSeen(c.id))), CH[ch - 1], () => startChapter(ch));
+}
+
+const MODE_LABEL = { study: "Nuova formula", cloze: "Completa la formula", quale: "Quale formula è giusta?", memoria: "A memoria" };
+const MODE_HL = { study: "h4c", cloze: "h1c", quale: "h2c", memoria: "h3c" };
+
+function buildOptions(it) {
+  const c = BY_ID[it.id];
+  if (it.mode === "cloze") {
+    return shuffle([{ tex: c.a, ok: true }].concat(c.d.map(t => ({ tex: t, ok: false }))));
+  }
+  // "Quale formula?": la formula giusta e i tre distrattori della STESSA scheda, scritti per intero.
+  // Niente formule di altre schede: sarebbero riconoscibili subito dal membro a sinistra.
+  return shuffle([{ tex: full(c), ok: true }].concat(c.d.map(t => ({ tex: fill(c, t), ok: false }))));
+}
+
+function renderQuestion() {
+  const it = SES.items[SES.i], c = BY_ID[it.id];
+  if (!it.opts && (it.mode === "cloze" || it.mode === "quale")) it.opts = buildOptions(it);
+  const pct = (SES.i / SES.items.length) * 100;
+  let body = "";
+  if (it.mode === "study") {
+    body = `<div class="panel">${M(full(c))}</div><p class="note">${esc(c.h)}</p>
+      <button class="btn primary big" data-act="studied">Fatto, l'ho letta</button>`;
+  } else if (it.mode === "cloze" || it.mode === "quale") {
+    const head = it.mode === "cloze" ? `<div class="panel">${M(clozeTex(c))}</div>` : "";
+    const opts = it.opts.map((o, k) => `<button class="opt" data-act="opt" data-k="${k}"><span class="k">${k + 1}</span>${M(o.tex, true)}</button>`).join("");
+    body = `${head}<div class="opts">${opts}</div><div id="fb"></div>`;
+  } else {
+    body = `<p class="hint">Scrivila su carta o dilla ad alta voce, poi controlla. Sii onesto: ti torna più avanti se non la sai.</p>
+      <div id="fb"><button class="btn primary big" data-act="reveal">Mostra la formula</button></div>`;
+  }
+  app.innerHTML = `
+  <div class="sesbar"><button class="link" data-act="quit">Esci</button>
+    <div class="prog" aria-hidden="true"><i style="width:${pct}%"></i></div>
+    <span class="count">${SES.i + 1}/${SES.items.length}</span></div>
+  <div class="wavebox small"><canvas id="wave" aria-hidden="true"></canvas>
+    <div class="wave-cap">combo ×${SES.combo} · modo n = ${Wave.n}</div></div>
+  <article class="q">
+    <div class="qhead"><span class="tag ${MODE_HL[it.mode]}">${MODE_LABEL[it.mode]}</span>
+      <span class="qch">${c.c} · ${esc(CH[c.c - 1])}</span></div>
+    <p class="prompt">${esc(it.mode === "cloze" ? c.n : c.q)}</p>
+    ${body}
+  </article>`;
+  SES.state = "ask";
+  Wave.attach(document.getElementById("wave"));
+  Wave.set(0.15, Wave.n);
+  mathAll(app);
+}
+
+function award(kind, res) {
+  let gain = 0;
+  if (res === "ok") {
+    SES.combo++; SES.maxCombo = Math.max(SES.maxCombo, SES.combo);
+    gain = (kind === "mem" ? 15 : 10) + 2 * Math.min(SES.combo - 1, 5);
+    Wave.kick(SES.combo);
+  } else if (res === "quasi") { gain = 5; }
+  else { SES.combo = 0; Wave.damp(); }
+  SES.xp += gain; S.xp += gain;
+  return gain;
+}
+function afterAnswer(it, res, kind) {
+  const c = BY_ID[it.id];
+  SES.tot++;
+  if (res === "ok") SES.ok++;
+  grade(it.id, kind, res);
+  const gain = award(kind, res);
+  if (res === "no") {
+    if (!SES.wrong.includes(it.id)) SES.wrong.push(it.id);
+    if (!SES.requeued.has(it.id)) {
+      SES.requeued.add(it.id);
+      SES.items.push({ id: it.id, mode: it.mode === "memoria" ? "memoria" : "cloze" });
+    }
+  }
+  save(); renderTop();
+  const cap = app.querySelector(".wave-cap"); if (cap) cap.textContent = `combo ×${SES.combo} · modo n = ${Wave.n}`;
+  return { c, gain };
+}
+function feedbackHtml(res, gain, c, showFormula) {
+  const msg = res === "ok" ? `Giusto! +${gain} XP` : res === "quasi" ? `Quasi. +${gain} XP, torna domani` : "Non era questa. Te la ripropongo.";
+  return `<div class="feedback ${res === "ok" ? "ok" : "no"}">
+    <div class="verdict">${msg}</div>
+    ${showFormula ? `<div class="panel">${M(full(c))}</div>` : ""}
+    <p class="note">${esc(c.h)}</p>
+    <button class="btn primary big" data-act="next" id="nextbtn">Avanti</button></div>`;
+}
+function answerOpt(k) {
+  if (SES.state !== "ask") return;
+  const it = SES.items[SES.i];
+  const o = it.opts[k]; if (!o) return;
+  SES.state = "done";
+  const res = o.ok ? "ok" : "no";
+  const { c, gain } = afterAnswer(it, res, "rec");
+  app.querySelectorAll(".opt").forEach((b, i) => {
+    b.disabled = true;
+    if (it.opts[i].ok) b.classList.add("ok");
+    else if (i === k) b.classList.add("no");
+    else b.classList.add("dim");
+  });
+  const fb = document.getElementById("fb");
+  fb.innerHTML = feedbackHtml(res, gain, c, it.mode === "cloze");
+  mathAll(fb);
+  const nb = document.getElementById("nextbtn"); nb.focus({ preventScroll: true });
+  nb.scrollIntoView({ behavior: Wave.still ? "auto" : "smooth", block: "nearest" });
+}
+function reveal() {
+  if (SES.state !== "ask") return;
+  SES.state = "graded-wait";
+  const c = BY_ID[SES.items[SES.i].id];
+  const fb = document.getElementById("fb");
+  fb.innerHTML = `<div class="panel">${M(full(c))}</div><p class="note">${esc(c.h)}</p>
+    <div class="muted" style="font-size:.9rem">Com'è andata?</div>
+    <div class="grades">
+      <button class="btn g-no" data-act="mem" data-r="no">Non la sapevo</button>
+      <button class="btn" data-act="mem" data-r="quasi">Quasi</button>
+      <button class="btn g-ok" data-act="mem" data-r="ok">Giusta</button></div>`;
+  mathAll(fb);
+}
+function gradeMem(r) {
+  if (SES.state !== "graded-wait") return;
+  SES.state = "done";
+  const it = SES.items[SES.i];
+  const { c, gain } = afterAnswer(it, r, "mem");
+  const fb = document.getElementById("fb");
+  fb.innerHTML = feedbackHtml(r, gain, c, true);
+  mathAll(fb);
+  document.getElementById("nextbtn").focus({ preventScroll: true });
+}
+function studied() {
+  const it = SES.items[SES.i];
+  grade(it.id, "study"); S.xp += 2; SES.xp += 2; save();
+  next();
+}
+function next() {
+  SES.i++;
+  if (SES.i >= SES.items.length) go("results"); else { render(); window.scrollTo(0, 0); }
+}
+
+function reviewListHtml(ids) {
+  return ids.map(id => { const c = BY_ID[id]; return `<article class="panel rv"><h3>${esc(c.n)}</h3>${M(full(c))}<p class="note">${esc(c.h)}</p></article>`; }).join("");
+}
+function renderResults() {
+  const up = level() > SES.startLevel;
+  app.innerHTML = `
+  <section class="hero">
+    <div class="eyebrow">${esc(SES.title)}</div>
+    <h1>Sessione <span class="mark">finita</span></h1>
+    ${up ? `<div class="levelup">Nuovo livello: ${esc(rankName(level()))}</div>` : ""}
+    <div class="tiles">
+      <div class="tile"><b>${SES.ok}/${SES.tot}</b><span>risposte giuste</span></div>
+      <div class="tile"><b>+${SES.xp}</b><span>XP guadagnati</span></div>
+      <div class="tile"><b>×${SES.maxCombo}</b><span>combo massima</span></div></div>
+    <div class="row">
+      <button class="btn primary" data-act="again">Un altro giro</button>
+      <button class="btn" data-act="home">Torna all'albero</button></div>
+  </section>
+  ${SES.wrong.length ? `<section><h2>Da rivedere</h2><div class="review-list">${reviewListHtml(SES.wrong)}</div></section>` : `<section><p class="muted">Nessun errore in questa sessione.</p></section>`}`;
+  mathAll(app);
+}
+
+/* ---------- lampo: giusta o sbagliata ---------- */
+let L = null;
+function startLampo() {
+  const seen = CARDS.filter(c => isSeen(c.id));
+  const pool = seen.length >= 12 ? seen : CARDS;
+  L = { pool, end: Date.now() + 60000, score: 0, combo: 0, n: 0, ok: 0, mistakes: [], cur: null, timer: 0, last: null, startLevel: level() };
+  go("lampo");
+}
+function nextLampo() {
+  let c; do { c = pick(L.pool); } while (L.pool.length > 1 && L.last && c.id === L.last);
+  L.last = c.id;
+  const truth = Math.random() < 0.5;
+  L.cur = { c, truth, tex: truth ? full(c) : fill(c, pick(c.d)) };
+  const card = document.getElementById("swipe");
+  card.classList.remove("ok", "no");
+  card.style.transform = "";
+  card.innerHTML = `<div class="qch">${esc(c.n)}</div>${M(L.cur.tex)}`;
+  mathAll(card);
+}
+function renderLampo() {
+  app.innerHTML = `
+  <div class="sesbar"><button class="link" data-act="quit-lampo">Esci</button>
+    <div class="timer" aria-hidden="true"><i id="tbar" style="width:100%"></i></div>
+    <span class="score" id="lscore">0</span></div>
+  <section style="margin-top:14px">
+    <div class="muted" style="font-size:.9rem">Questa formula è giusta o sbagliata? Scorri a destra se è giusta, a sinistra se è sbagliata, o usa i pulsanti.</div>
+    <article class="swipe" id="swipe"></article>
+    <div class="vf"><button class="btn v-no" data-act="vf" data-v="0">← Sbagliata</button><button class="btn v-yes" data-act="vf" data-v="1">Giusta →</button></div>
+    <div class="combo" id="lcombo">combo ×0</div>
+    <div class="toast" id="ltoast" aria-live="polite"></div>
+  </section>`;
+  nextLampo();
+  bindSwipe(document.getElementById("swipe"));
+  clearInterval(L.timer);
+  L.timer = setInterval(() => {
+    const left = L.end - Date.now();
+    const bar = document.getElementById("tbar");
+    if (bar) bar.style.width = Math.max(0, left / 600) + "%";
+    if (left <= 0) endLampo();
+  }, 100);
+}
+function answerLampo(saysTrue) {
+  if (!L || !L.cur || Date.now() > L.end) return;
+  const right = saysTrue === L.cur.truth;
+  const card = document.getElementById("swipe");
+  L.n++;
+  const toast = document.getElementById("ltoast");
+  if (right) {
+    L.ok++; L.combo++;
+    const pts = 10 + 2 * Math.min(L.combo - 1, 10);
+    L.score += pts;
+    grade(L.cur.c.id, "lampo", "ok");
+    card.classList.add("ok");
+    toast.innerHTML = "";
+  } else {
+    L.combo = 0;
+    grade(L.cur.c.id, "lampo", "no");
+    L.mistakes.push({ id: L.cur.c.id, shown: L.cur.tex, truth: L.cur.truth });
+    card.classList.add("no");
+    toast.innerHTML = `<div class="t-head">${L.cur.truth ? "Era giusta." : "Era sbagliata. Quella giusta:"}</div>${L.cur.truth ? "" : M(full(L.cur.c))}`;
+    mathAll(toast);
+  }
+  document.getElementById("lscore").textContent = L.score;
+  document.getElementById("lcombo").textContent = `combo ×${L.combo}`;
+  L.cur = null;
+  setTimeout(() => { if (VIEW.name === "lampo" && Date.now() <= L.end) nextLampo(); }, right ? 260 : 650);
+}
+function endLampo() {
+  if (!L) return;
+  clearInterval(L.timer);
+  const xp = Math.round(L.score / 5);
+  S.xp += xp; L.xp = xp;
+  L.record = L.score > S.best.lampo;
+  if (L.record) S.best.lampo = L.score;
+  if (L.n) touchStreak();
+  save();
+  go("lampo-end");
+}
+function renderLampoEnd() {
+  const acc = L.n ? Math.round((L.ok / L.n) * 100) : 0;
+  const up = level() > L.startLevel;
+  const list = L.mistakes.map(m => {
+    const c = BY_ID[m.id];
+    return `<article class="panel rv"><h3>${esc(c.n)}</h3>
+      <div class="muted" style="font-size:.85rem">${m.truth ? "Era giusta, l'hai scartata:" : "Era sbagliata. Quella giusta è:"}</div>${M(full(c))}<p class="note">${esc(c.h)}</p></article>`;
+  }).join("");
+  app.innerHTML = `
+  <section class="hero">
+    <div class="eyebrow">Lampo · 60 secondi</div>
+    <h1>${L.record ? 'Nuovo <span class="mark">record!</span>' : 'Tempo <span class="mark">scaduto</span>'}</h1>
+    ${up ? `<div class="levelup">Nuovo livello: ${esc(rankName(level()))}</div>` : ""}
+    <div class="tiles">
+      <div class="tile"><b>${L.score}</b><span>punti (record ${S.best.lampo})</span></div>
+      <div class="tile"><b>${L.ok}/${L.n}</b><span>giuste (${acc}%)</span></div>
+      <div class="tile"><b>+${L.xp}</b><span>XP</span></div></div>
+    <div class="row"><button class="btn primary" data-act="lampo">Ancora</button><button class="btn" data-act="home">Torna all'albero</button></div>
+  </section>
+  ${list ? `<section><h2>Gli errori</h2><div class="review-list">${list}</div></section>` : ""}`;
+  mathAll(app);
+}
+function bindSwipe(el) {
+  let x0 = null, dx = 0, id = null;
+  el.addEventListener("pointerdown", e => { if (!L || !L.cur) return; x0 = e.clientX; dx = 0; id = e.pointerId; try { el.setPointerCapture(id); } catch (_) {} });
+  el.addEventListener("pointermove", e => {
+    if (x0 === null || e.pointerId !== id) return;
+    dx = e.clientX - x0;
+    if (!Wave.still) el.style.transform = `translateX(${dx}px) rotate(${dx / 30}deg)`;
+    el.classList.toggle("ok", dx > 60); el.classList.toggle("no", dx < -60);
+  });
+  const end = e => {
+    if (x0 === null || (e && e.pointerId !== id)) return;
+    x0 = null;
+    if (Math.abs(dx) > 90) { answerLampo(dx > 0); }
+    else { el.style.transform = ""; el.classList.remove("ok", "no"); }
+    dx = 0;
+  };
+  el.addEventListener("pointerup", end);
+  el.addEventListener("pointercancel", () => { x0 = null; el.style.transform = ""; el.classList.remove("ok", "no"); });
+}
+
+/* ---------- eventi ---------- */
+let resetArmed = false;
+app.addEventListener("click", e => {
+  const b = e.target.closest("[data-act]"); if (!b) return;
+  const a = b.getAttribute("data-act");
+  if (a === "review") startReview();
+  else if (a === "lampo") startLampo();
+  else if (a === "free") startFree(b.getAttribute("data-mode"));
+  else if (a === "filter") { VIEW.filter = +b.getAttribute("data-ch"); app.querySelectorAll(".chip").forEach(x => x.setAttribute("aria-pressed", String(x === b))); }
+  else if (a === "chapter") go("chapter", { ch: +b.getAttribute("data-ch") });
+  else if (a === "train-ch") startChapter(VIEW.ch);
+  else if (a === "home") go("home");
+  else if (a === "quit") { SES = null; go("home"); }
+  else if (a === "quit-lampo") { if (L) clearInterval(L.timer); L = null; go("home"); }
+  else if (a === "opt") answerOpt(+b.getAttribute("data-k"));
+  else if (a === "reveal") reveal();
+  else if (a === "mem") gradeMem(b.getAttribute("data-r"));
+  else if (a === "studied") studied();
+  else if (a === "next") next();
+  else if (a === "again") { const f = SES && SES.again; if (f) f(); else go("home"); }
+  else if (a === "vf") answerLampo(b.getAttribute("data-v") === "1");
+  else if (a === "reset") {
+    if (!resetArmed) { resetArmed = true; b.textContent = "Tocca di nuovo per azzerare tutto"; setTimeout(() => { resetArmed = false; const r = document.getElementById("resetbtn"); if (r) r.textContent = "Azzera i progressi"; }, 4000); }
+    else { resetArmed = false; S = blank(); save(); go("home"); }
+  }
+});
+document.addEventListener("keydown", e => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  if (VIEW.name === "session" && SES) {
+    const it = SES.items[SES.i];
+    if (SES.state === "ask" && (it.mode === "cloze" || it.mode === "quale") && /^[1-4]$/.test(e.key)) { e.preventDefault(); answerOpt(+e.key - 1); }
+    else if (SES.state === "ask" && it.mode === "memoria" && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); reveal(); }
+    else if (SES.state === "ask" && it.mode === "study" && e.key === "Enter") { e.preventDefault(); studied(); }
+    else if (SES.state === "done" && e.key === "Enter" && document.activeElement && document.activeElement.id !== "nextbtn") { e.preventDefault(); next(); }
+  } else if (VIEW.name === "lampo") {
+    if (e.key === "ArrowRight") { e.preventDefault(); answerLampo(true); }
+    else if (e.key === "ArrowLeft") { e.preventDefault(); answerLampo(false); }
+  }
+});
+
+function start() { render(); Sync.init(); }
+const hot = window.claude && window.claude.hot;
+if (hot && typeof hot.ready === "function") hot.ready(start); else start();
+</script>
+</body>
+</html>
