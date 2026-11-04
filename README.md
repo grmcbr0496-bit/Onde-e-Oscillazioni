@@ -32,7 +32,7 @@ Il service worker e i font locali richiedono un indirizzo `http://` o `https://`
 (`file://`) l'app funziona lo stesso, ma senza modalità offline e con i font di sistema.
 
 ```bash
-cd onde-formule
+cd Onde-e-Oscillazioni
 python3 -m http.server 8000
 # poi apri http://localhost:8000
 ```
@@ -41,9 +41,9 @@ python3 -m http.server 8000
 
 1. **Pubblica la cartella su un indirizzo HTTPS.** Ecco due modi gratuiti.
    - **GitHub Pages:** nel repository vai su *Settings → Pages → Build and deployment*, scegli *Deploy from a branch*,
-     poi il branch e la cartella `/ (root)`. Dopo un minuto l'app è su
-     `https://<utente>.github.io/<repository>/onde-formule/`. Il file `.nojekyll` è già incluso.
-   - **Netlify Drop:** apri <https://app.netlify.com/drop> e trascina la cartella `onde-formule`. Ottieni un indirizzo
+     poi il branch `main` e la cartella `/ (root)`. Dopo un minuto l'app è su
+     <https://grmcbr0496-bit.github.io/Onde-e-Oscillazioni/>. Il file `.nojekyll` è già incluso.
+   - **Netlify Drop:** apri <https://app.netlify.com/drop> e trascina la cartella del repository. Ottieni un indirizzo
      `https://<nome>.netlify.app`.
 2. Sul telefono apri l'indirizzo con **Chrome**.
 3. Tocca il menu **⋮** e poi **Installa app** (oppure **Aggiungi a schermata Home**). In *Progressi* c'è anche il pulsante
@@ -72,7 +72,7 @@ Prerequisiti: Node.js 18 o superiore e la PWA già pubblicata in HTTPS (vedi sop
 ```bash
 npm install -g @bubblewrap/cli
 mkdir onde-formule-apk && cd onde-formule-apk
-bubblewrap init --manifest https://<il-tuo-indirizzo>/onde-formule/manifest.json
+bubblewrap init --manifest https://grmcbr0496-bit.github.io/Onde-e-Oscillazioni/manifest.json
 #   - Application ID (package): es. it.<tuonome>.ondeformule
 #   - Display mode: standalone   - Orientation: portrait
 #   - crea una nuova chiave di firma (annota password e percorso del keystore)
@@ -93,8 +93,8 @@ Senza verifica la TWA mostra una sottile barra con l'indirizzo. Per toglierla:
    con la firma gestita da Google, usa l'impronta che trovi in *Play Console → Integrità dell'app*.
 3. Il file deve stare alla **radice del dominio**: `https://<dominio>/.well-known/assetlinks.json`.
    - Con Netlify (`https://<nome>.netlify.app`) basta pubblicare la cartella così com'è.
-   - Con GitHub Pages di un repository di progetto (`<utente>.github.io/<repo>/`) la radice è `<utente>.github.io`:
-     il file va messo nel repository speciale `<utente>.github.io`, nella cartella `.well-known/`.
+   - Con GitHub Pages di questo repository (`grmcbr0496-bit.github.io/Onde-e-Oscillazioni/`) la radice è
+     `grmcbr0496-bit.github.io`: il file va messo nel repository speciale `grmcbr0496-bit.github.io`, nella cartella `.well-known/`.
 4. Ricostruisci con `bubblewrap build` (non serve se il file è cambiato solo sul sito).
 
 Il codice del gioco non cambia mai: Bubblewrap legge `manifest.json` e le icone già pronte.
