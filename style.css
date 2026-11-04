@@ -429,7 +429,7 @@ body { padding-bottom: calc(66px + env(safe-area-inset-bottom)); }
 .pstat.ok { border-color: var(--good); color: var(--good); }
 .pstat.no { border-color: var(--bad); color: var(--bad); }
 .datatab { display: flex; flex-wrap: wrap; gap: 6px 14px; }
-.datatab span { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 2px 8px; }
+.datatab > span { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 2px 8px; }
 .steps { margin: 0; padding-left: 22px; display: grid; gap: 8px; }
 .steps li::marker { font-family: var(--font-mono); font-weight: 600; color: var(--pen); }
 .steps li.hide { display: none; }
