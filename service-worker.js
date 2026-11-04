@@ -2,10 +2,9 @@
    Strategia: tutti i file dell'app in cache all'installazione; poi "cache first" con aggiornamento in background.
    Una nuova versione si installa in attesa e si attiva quando l'utente tocca "Aggiorna". */
 "use strict";
-const VERSION = "of-c72f7bbfe7";
+const VERSION = "of-a4c3380810";
 const PRECACHE = [
  "./",
- "./ERRATA-APPUNTI.md",
  "./app.js",
  "./data-formule.js",
  "./data-problemi.js",
@@ -70,11 +69,9 @@ self.addEventListener("fetch", event => {
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
   if (req.mode === "navigate") {
-    // pagina: dalla cache (funziona offline); se c'è rete la aggiorno per la prossima volta
-    event.respondWith(caches.open(VERSION).then(cache => cache.match("./index.html").then(hit => {
-      const net = fetch(req).then(res => { if (res.ok && url.pathname.endsWith("/")) cache.put("./index.html", res.clone()); return res; }).catch(() => hit);
-      return hit || net;
-    })));
+    // pagina: sempre quella della versione in cache, così HTML, script e stile restano della stessa versione.
+    // La nuova pagina arriva con il nuovo service worker (precache) e si attiva con "Aggiorna".
+    event.respondWith(caches.open(VERSION).then(cache => cache.match("./index.html")).then(hit => hit || fetch(req)));
     return;
   }
   event.respondWith(caches.open(VERSION).then(cache => cache.match(req, { ignoreSearch: true }).then(hit => hit || fetch(req).then(res => {

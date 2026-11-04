@@ -16,11 +16,10 @@ const HL = n => "h" + (((n - 1) % 5) + 1) + "c";
 const CH = CHAPTERS;
 const GRAPHS_L = typeof GRAPHS !== "undefined" ? GRAPHS : [];
 const CONCEPTS_L = typeof CONCEPTS !== "undefined" ? CONCEPTS : [];
-const BY_ID = Object.fromEntries(CARDS.map(c => [c.id, c]));
-const Q_BY = Object.fromEntries(QUIZ.map(q => [q.id, q]));
-const G_BY = Object.fromEntries(GRAPHS_L.map(g => [g.id, g]));
-const P_BY = Object.fromEntries(PROBLEMS.map(p => [p.id, p]));
-const K_BY = Object.fromEntries(CONCEPTS_L.map(k => [k.id, k]));
+/* mappe senza prototipo: un id come "constructor" o "__proto__" in un file importato non trova nulla */
+const own = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
+const dict = list => Object.assign(Object.create(null), Object.fromEntries(list.map(x => [x.id, x])));
+const BY_ID = dict(CARDS), Q_BY = dict(QUIZ), G_BY = dict(GRAPHS_L), P_BY = dict(PROBLEMS), K_BY = dict(CONCEPTS_L);
 const labKey = id => { const m = /^(\d+)([a-z]*)$/.exec(id) || [0, 99, id]; return [LABS[id].c || +m[1], +m[1], m[2]]; };
 const LAB_IDS = Object.keys(LABS).sort((a, b) => { const A = labKey(a), B = labKey(b); return A[0] - B[0] || A[1] - B[1] || (A[2] < B[2] ? -1 : A[2] > B[2] ? 1 : 0); });
 const labsOf = ch => LAB_IDS.filter(id => LABS[id].c === ch);
@@ -33,7 +32,7 @@ const pick = a => a[Math.floor(Math.random() * a.length)];
 const fill = (c, piece) => c.t.split("@@").join(piece);
 const full = c => fill(c, c.a);
 const clozeTex = c => fill(c, "\\boxed{\\;?\\;}");
-const today = (offset = 0) => new Date(Date.now() + offset).toLocaleDateString("sv-SE");
+const today = (days = 0) => { const d = new Date(); d.setDate(d.getDate() + days); return d.toLocaleDateString("sv-SE"); };   // per giorni di calendario: regge il cambio dell'ora
 /* testo con formule $...$ e **grassetto**: il testo viene sempre passato da esc() */
 const rich = s => String(s == null ? "" : s).split("$").map((p, i) => i % 2 ? `<span class="im" data-tex="${esc(p)}"></span>` : esc(p).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")).join("");
 const M = (tex, inline) => `<div class="math" data-tex="${esc(tex)}"${inline ? " data-inline" : ""}></div>`;
@@ -60,7 +59,7 @@ function errExists(key) {
 }
 function missionValid(key) {
   const m = /^([0-9]+[a-z]*)\.(\d+)$/.exec(key);
-  return !!(m && LABS[m[1]] && +m[2] < LABS[m[1]].missions.length);
+  return !!(m && own(LABS, m[1]) && +m[2] < LABS[m[1]].missions.length);
 }
 /* Costruisce uno stato pulito copiando solo campi noti e validati (vale per localStorage e per i file importati). */
 function sanitize(src) {
@@ -88,7 +87,7 @@ function sanitize(src) {
     const keys = Object.keys(src.days).filter(d => DATE_RE.test(d)).sort().slice(-120);
     for (const d of keys) out.days[d] = Math.round(num(src.days[d], 0, 1e5, 0));
   }
-  if (src.labs && typeof src.labs === "object") for (const k of Object.keys(src.labs)) if (LABS[k]) out.labs[k] = 1;
+  if (src.labs && typeof src.labs === "object") for (const k of Object.keys(src.labs)) if (own(LABS, k)) out.labs[k] = 1;
   if (src.exam && typeof src.exam === "object") for (const k of Object.keys(src.exam)) if (K_BY[k]) out.exam[k] = 1;
   if (src.settings && typeof src.settings === "object") {
     if (["auto", "light", "dark"].includes(src.settings.theme)) out.settings.theme = src.settings.theme;
@@ -102,7 +101,7 @@ function mergeLegacy(cur, old) {
   const o = sanitize({ cards: old.cards, qs: old.qs, missions: old.missions, xp: old.xp, streak: old.streak, best: old.best });
   add(cur.cards, o.cards); add(cur.qs, o.qs);
   Object.assign(cur.missions, o.missions);
-  cur.xp += o.xp; cur.best.lampo = Math.max(cur.best.lampo, o.best.lampo);
+  cur.xp = Math.max(cur.xp, o.xp); cur.best.lampo = Math.max(cur.best.lampo, o.best.lampo);
   cur.streak.best = Math.max(cur.streak.best, o.streak.best);
   return cur;
 }
@@ -131,7 +130,7 @@ function touchStreak() {
   const t = today();
   S.days[t] = (S.days[t] || 0) + 1;
   if (S.streak.last === t) return;
-  S.streak.n = S.streak.last === today(-DAY) ? S.streak.n + 1 : 1;
+  S.streak.n = S.streak.last === today(-1) ? S.streak.n + 1 : 1;
   S.streak.last = t;
   S.streak.best = Math.max(S.streak.best, S.streak.n);
 }
@@ -147,6 +146,7 @@ function gradeCard(id, kind, res) {
   x.seen = 1;
   if (kind === "study") { x.due = now; }
   else if (kind === "lampo") {
+    if (!(S.cards[id] && S.cards[id].seen)) { touchStreak(); return; }   // una formula mai studiata non entra nel ripasso da un Lampo
     if (res === "no") { x.b = Math.max(0, x.b - 1); x.due = now; x.w++; } else { x.r++; }
     x.s++;
   } else {
@@ -296,8 +296,11 @@ window.addEventListener("popstate", e => {
 });
 function render() {
   const n = VIEW.name;
-  if ((n === "session" || n === "results") && !SES) VIEW = { name: "home" };
-  if ((n === "lampo" || n === "lampo-end") && !L) VIEW = { name: "formule" };
+  if ((n === "session" || n === "results") && (!SES || (VIEW.sid && VIEW.sid !== SES.sid))) VIEW = { name: "home" };
+  else if (n === "session" && SES.finished) VIEW = { name: "results", sid: SES.sid };
+  if ((n === "lampo" || n === "lampo-end") && (!L || (VIEW.lid && VIEW.lid !== L.id))) VIEW = { name: "formule" };
+  else if (n === "lampo" && L.xp != null) VIEW = { name: "lampo-end", lid: L.id };
+  else if (n === "lampo-end" && L.xp == null) VIEW = { name: "lampo", lid: L.id };
   const R = { home: renderHome, formule: renderFormule, chapter: renderChapter, concept: renderConcept, session: renderItem, results: renderResults,
     lampo: renderLampo, "lampo-end": renderLampoEnd, labs: renderLabs, lab: renderLab, quiz: renderQuizHome, problemi: renderProblems,
     problema: renderProblem, allena: renderAllena, errori: renderErrors, progressi: renderProgress }[VIEW.name] || renderHome;
@@ -551,11 +554,13 @@ function withChecks(base, fresh) {
 function startSession(items, title, again, opt) {
   if (!items.length) { toast("Niente da proporre con questi filtri."); return; }
   opt = opt || {};
-  SES = { items, i: 0, ok: 0, tot: 0, combo: 0, maxCombo: 0, xp: 0, wrong: [], requeued: new Set(), title, again, startLevel: level(), state: "ask",
-    from: Object.assign({}, VIEW), section: SECTION_OF[VIEW.name] || "home", rapido: !!opt.rapido, end: opt.rapido ? Date.now() + RAPIDO_MS : 0, record: opt.record || null, timer: 0, timeUp: false };
+  const prev = SES; if (prev && prev.timer) clearInterval(prev.timer);
+  const inherit = prev && (VIEW.name === "results" || VIEW.name === "session");   // "Un altro giro": si torna dove si era partiti
+  SES = { sid: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), items, i: 0, ok: 0, tot: 0, combo: 0, maxCombo: 0, xp: 0, wrong: [], requeued: new Set(), title, again, startLevel: level(), state: "ask",
+    from: inherit ? prev.from : Object.assign({}, VIEW), section: inherit ? prev.section : (SECTION_OF[VIEW.name] || "home"), rapido: !!opt.rapido, end: opt.rapido ? Date.now() + RAPIDO_MS : 0, record: opt.record || null, timer: 0, timeUp: false };
   Wave.A = 0.15; Wave.n = 1;
   if (SES.rapido) SES.timer = setInterval(tickRapido, 250);
-  go("session");
+  go("session", { sid: SES.sid });
 }
 const card = (id, mode) => ({ type: "card", id, mode });
 function startToday() {
@@ -647,8 +652,9 @@ function tickRapido() {
 }
 function finishSession() {
   if (SES && SES.timer) clearInterval(SES.timer);
+  if (SES) SES.finished = true;
   if (SES && SES.record) { SES.isRecord = SES.ok > S.best[SES.record]; if (SES.isRecord) S.best[SES.record] = SES.ok; save(); }
-  go("results", {}, { replace: true });
+  go("results", { sid: SES && SES.sid }, { replace: true });
 }
 
 const MODE_LABEL = { study: "Nuova formula", cloze: "Completa la formula", quale: "Quale formula è giusta?", memoria: "A memoria" };
@@ -664,7 +670,7 @@ function buildOptions(it) {
   const src = it.type === "q" ? Q_BY[it.id] : it.type === "g" ? G_BY[it.id] : P_BY[it.id];
   return shuffle(src.o.map((t, k) => ({ t, ok: k === 0 })));
 }
-function itemValid(it) { return it.type === "card" ? !!BY_ID[it.id] : it.type === "q" ? !!Q_BY[it.id] : it.type === "g" ? !!G_BY[it.id] : !!P_BY[it.id]; }
+function itemValid(it) { return !!(it && (it.type === "card" ? BY_ID[it.id] : it.type === "q" ? Q_BY[it.id] : it.type === "g" ? G_BY[it.id] : it.type === "p" ? P_BY[it.id] : null)); }
 function sesHeader() {
   const pct = (SES.i / SES.items.length) * 100;
   const mid = SES.rapido
@@ -679,7 +685,7 @@ function optsHtml(it, txtMode) {
     : `<button class="opt" data-act="opt" data-k="${k}"><span class="k">${k + 1}</span>${M(o.tex, true)}</button>`).join("")}</div>`;
 }
 function renderItem() {
-  while (SES.i < SES.items.length && !itemValid(SES.items[SES.i])) SES.i++;
+  while (SES.i < SES.items.length && (!itemValid(SES.items[SES.i]) || SES.items[SES.i].answered)) SES.i++;   // indietro/avanti non fa rispondere due volte
   if (SES.i >= SES.items.length) return finishSession();
   const it = SES.items[SES.i];
   if (!it.opts && !(it.type === "card" && (it.mode === "study" || it.mode === "memoria"))) it.opts = buildOptions(it);
@@ -732,6 +738,7 @@ function award(kind, res, it) {
   return gain;
 }
 function afterAnswer(it, res, kind) {
+  it.answered = true;
   SES.tot++;
   if (res === "ok") SES.ok++;
   if (it.type === "card") gradeCard(it.id, kind, res);
@@ -823,7 +830,8 @@ function gradeMem(r) {
   document.getElementById("nextbtn").focus({ preventScroll: true });
 }
 function studied() {
-  const it = SES.items[SES.i];
+  const it = SES.items[SES.i]; if (!it || it.answered) return next();
+  it.answered = true;
   gradeCard(it.id, "study"); S.xp += 2; SES.xp += 2; save();
   next();
 }
@@ -862,8 +870,8 @@ function renderResults() {
 let L = null;
 function startLampo() {
   const seen = CARDS.filter(c => isSeen(c.id)), pool = seen.length >= 12 ? seen : CARDS;
-  L = { pool, end: Date.now() + 60000, score: 0, combo: 0, n: 0, ok: 0, mistakes: [], cur: null, timer: 0, last: null, startLevel: level() };
-  go("lampo");
+  L = { id: Date.now().toString(36), pool, end: Date.now() + 60000, score: 0, combo: 0, n: 0, ok: 0, mistakes: [], cur: null, timer: 0, last: null, startLevel: level() };
+  go("lampo", { lid: L.id });
 }
 function nextLampo() {
   let c; do { c = pick(L.pool); } while (L.pool.length > 1 && L.last && c.id === L.last);
@@ -920,7 +928,7 @@ function endLampo() {
   L.xp = Math.round(L.score / 5); S.xp += L.xp;
   L.record = L.score > S.best.lampo; if (L.record) S.best.lampo = L.score;
   if (L.n) touchStreak();
-  save(); go("lampo-end", {}, { replace: true });
+  save(); go("lampo-end", { lid: L.id }, { replace: true });
 }
 function renderLampoEnd() {
   const acc = L.n ? Math.round((L.ok / L.n) * 100) : 0, up = level() > L.startLevel;
@@ -1022,7 +1030,7 @@ function renderLab() {
     ${nq ? `<button class="btn primary big" data-act="quiz-ch" data-ch="${def.c}">Domande su questo ramo (${nq})</button>` : ""}
   </section>`;
   mathAll(app);
-  updateReadouts(); checkMissions(true); updateLoudWarn();
+  updateReadouts(); updateLoudWarn();   // le missioni si completano solo muovendo i comandi
   const loop = ts => {
     if (!LAB || VIEW.name !== "lab") return;
     const dt = LAB.last ? Math.min(0.05, (ts - LAB.last) / 1000) : 0; LAB.last = ts;
@@ -1059,8 +1067,8 @@ function checkMissions() {
     toast(`Missione compiuta! +${MISSION_XP} XP`);
   });
 }
-function afterLabChange() {
-  updateReadouts(); checkMissions(); LabAudio.update(); updateLoudWarn();
+function afterLabChange(fromPreset) {
+  updateReadouts(); if (!fromPreset) checkMissions(); LabAudio.update(); updateLoudWarn();
   if (!LAB.playing) drawLab();
 }
 function onParam(el) {
@@ -1089,7 +1097,7 @@ function applyPreset(k) {
   });
   LAB.state = null;
   if (pr.note) toast(pr.note);
-  afterLabChange();
+  afterLabChange(true);
 }
 
 /* audio dei laboratori (Web Audio API), con limitatore e spegnimento automatico */
@@ -1213,13 +1221,14 @@ function answerProblem(k) {
   if (!PB || PB.done) return;
   const p = P_BY[PB.id], o = PB.opts[k]; if (!o) return;
   PB.done = true;
+  const prev = S.probs[p.id], fresh = !(prev && prev.r > 0 && prev.due > Date.now());   // rifatto prima della scadenza: niente XP
   gradeSrs("probs", "p", p.id, o.ok);
-  let gain = 0; if (o.ok) { gain = (PB.hint ? 5 : 10) + 5 * (p.diff || 1); S.xp += gain; }
+  let gain = 0; if (o.ok && fresh) { gain = (PB.hint ? 5 : 10) + 5 * (p.diff || 1); S.xp += gain; }
   save(); renderTop();
   app.querySelectorAll(".opt").forEach((b, i) => { b.disabled = true; if (PB.opts[i].ok) b.classList.add("ok"); else if (i === k) b.classList.add("no"); else b.classList.add("dim"); });
   const h = document.getElementById("phint"); if (h) h.innerHTML = "";
   const fb = document.getElementById("fb");
-  fb.innerHTML = `<div class="feedback ${o.ok ? "ok" : "no"}"><div class="verdict">${o.ok ? `Giusto! +${gain} XP` : "Non è questo il risultato. Seguiamo la soluzione."}</div>
+  fb.innerHTML = `<div class="feedback ${o.ok ? "ok" : "no"}"><div class="verdict">${o.ok ? (gain ? `Giusto! +${gain} XP` : "Giusto! (già risolto: gli XP tornano quando è in scadenza)") : "Non è questo il risultato. Seguiamo la soluzione."}</div>
     ${solutionHtml(p, false)}
     <div class="row"><button class="btn primary" data-act="pnext">Prossimo problema</button><button class="btn" data-act="problem" data-id="${esc(p.id)}">Rifallo</button></div></div>`;
   mathAll(fb);
@@ -1300,7 +1309,7 @@ function renderProgress() {
   const o = overall(), gd = gapData(), totS = Object.values(S.cards).concat(Object.values(S.qs), Object.values(S.gs), Object.values(S.probs));
   const answers = totS.reduce((a, x) => a + x.s, 0), right = totS.reduce((a, x) => a + x.r, 0);
   const acc = answers ? Math.round(right / answers * 100) : 0;
-  const days = []; for (let k = 13; k >= 0; k--) { const d = today(-k * DAY), n = S.days[d] || 0; days.push(`<i class="${n >= 30 ? "a3" : n >= 10 ? "a2" : n > 0 ? "a1" : ""}" title="${d}: ${n} risposte"></i>`); }
+  const days = []; for (let k = 13; k >= 0; k--) { const d = today(-k), n = S.days[d] || 0; days.push(`<i class="${n >= 30 ? "a3" : n >= 10 ? "a2" : n > 0 ? "a1" : ""}" title="${d}: ${n} risposte"></i>`); }
   const cols = ["Formule", "Concetti", "Lab", "Problemi"];
   const gap = `<div class="gap" role="table" aria-label="Mappa delle lacune"><span></span>${cols.map(c => `<span class="gh">${c}</span>`).join("")}
     ${gd.map(r => `<span class="gn" title="${esc(r.name)}">${r.ch} · ${esc(r.name)}</span>${r.cells.map((v, j) => v === null ? `<span class="gc na">–</span>`
@@ -1386,7 +1395,7 @@ function importProgress(file) {
         S = pendingImport; pendingImport = null; save(); applyTheme(); toast("Progressi importati."); go("progressi", {}, { replace: true });
       });
     } else if (data.v === 1 && (data.cards || data.qs || data.missions)) {
-      S = mergeLegacy(S, data); save(); toast("Progressi delle app originali uniti ai tuoi."); go("progressi", {}, { replace: true });
+      banner("Unire ai tuoi i progressi delle app originali contenuti nel file?", "Unisci", () => { S = mergeLegacy(S, data); save(); toast("Progressi delle app originali uniti ai tuoi."); go("progressi", {}, { replace: true }); });
     } else toast("Il file non contiene progressi di Onde & Formule.");
   };
   rd.onerror = () => toast("Non riesco a leggere il file.");
@@ -1480,7 +1489,7 @@ document.addEventListener("keydown", e => {
     if (SES.state === "ask" && it.opts && /^[1-4]$/.test(e.key)) { e.preventDefault(); answerOpt(+e.key - 1); }
     else if (SES.state === "ask" && it.type === "card" && it.mode === "memoria" && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); reveal(); }
     else if (SES.state === "ask" && it.type === "card" && it.mode === "study" && e.key === "Enter") { e.preventDefault(); studied(); }
-    else if (SES.state === "done" && e.key === "Enter" && document.activeElement && document.activeElement.id !== "nextbtn") { e.preventDefault(); next(); }
+    else if (SES.state === "done" && e.key === "Enter" && document.activeElement && document.activeElement.id !== "nextbtn" && document.activeElement.tagName !== "BUTTON") { e.preventDefault(); next(); }
   } else if (VIEW.name === "lampo") {
     if (e.key === "ArrowRight") { e.preventDefault(); answerLampo(true); }
     else if (e.key === "ArrowLeft") { e.preventDefault(); answerLampo(false); }
@@ -1498,14 +1507,15 @@ window.addEventListener("appinstalled", () => { installEvt = null; toast("App in
 function registerSW() {
   if (!("serviceWorker" in navigator) || !/^https?:$/.test(location.protocol)) return;
   let userAsked = false;
-  const offer = w => banner("È pronta una nuova versione dell'app.", "Aggiorna", () => { userAsked = true; w.postMessage({ type: "SKIP_WAITING" }); });
+  const first = !navigator.serviceWorker.controller;
+  const offer = w => banner("È pronta una nuova versione dell'app.", "Aggiorna", () => { userAsked = true; if (w.state === "activated") location.reload(); else w.postMessage({ type: "SKIP_WAITING" }); });
   navigator.serviceWorker.register("service-worker.js").then(reg => {
     if (reg.waiting && navigator.serviceWorker.controller) offer(reg.waiting);
     reg.addEventListener("updatefound", () => {
       const nw = reg.installing; if (!nw) return;
       nw.addEventListener("statechange", () => {
         if (nw.state === "installed" && navigator.serviceWorker.controller) offer(nw);
-        if (nw.state === "activated" && !navigator.serviceWorker.controller) toast("Pronta anche offline.");
+        if (nw.state === "activated" && first) toast("Pronta anche offline.");
       });
     });
   }).catch(() => {});
@@ -1517,7 +1527,7 @@ function start() {
   const go0 = new URLSearchParams(location.search).get("go");
   const routes = { rapido: "home", labs: "labs", formule: "formule", problemi: "problemi", quiz: "quiz", progressi: "progressi" };
   VIEW = { name: routes[go0] || "home" };
-  try { history.replaceState({ v: VIEW }, ""); } catch (e) {}
+  try { history.replaceState({ v: VIEW }, "", go0 ? location.pathname + location.hash : undefined); } catch (e) { try { history.replaceState({ v: VIEW }, ""); } catch (e2) {} }
   render();
   if (go0 === "rapido") startRapido();
   registerSW();

@@ -8,7 +8,7 @@ I contenuti sono stati confrontati con le 82 pagine degli appunti “Onde – sc
 ### Correzioni obbligatorie
 - **KaTeX.** Entrambe le app caricavano KaTeX dal CDN: senza connessione, o se il CDN non rispondeva, le formule restavano testo grezzo.
   Ora si usa KaTeX **0.16.11** incluso nel progetto (`vendor/katex/`, con i font), quindi funziona anche offline.
-  Tutte le 5677 formule del gioco sono state verificate con KaTeX 0.16.11 in modalità severa: 0 errori.
+  Tutte le 5706 formule del gioco sono state verificate con KaTeX 0.16.11 in modalità severa: 0 errori.
   Nei file originali (`originali/`) `<link>` e `<script>` puntano ora a `katex@0.16.11`.
   Nota: `katex@0.16.47` esiste su npm (pubblicata il 16/05/2026), quindi il problema non era il numero di versione
   ma la dipendenza dal CDN. Come richiesto, è stata comunque sostituita con la 0.16.11.
@@ -81,3 +81,14 @@ In più:
   Il file importato viene validato campo per campo; i progressi delle app originali, se presenti sullo stesso dominio o in un file, vengono uniti.
 - **Sicurezza**: nessun contenuto entra nella pagina come HTML senza escaping. È stata provata l'importazione di un file con HTML e script nei campi: tutto scartato.
 - **Tema** chiaro, scuro o automatico, con impostazione manuale in Progressi.
+
+### Collaudo
+- **Prove automatiche in Chromium**: ogni capitolo, concetto, laboratorio (con tutte le scelte, i preset e gli slider agli estremi), problema, grafico, domanda e scheda, a 320, 360 e 390 px e in tema chiaro e scuro. Risultato: nessun errore in console, nessuna formula non resa, nessuno scorrimento laterale.
+- **Offline**: dopo il primo caricamento l'app funziona senza rete, con formule e font.
+- **Revisione del codice**: 13 bug corretti.
+  - Non si può più rispondere due volte alla stessa domanda con indietro e avanti.
+  - Un file importato con chiavi come `constructor` non manda più in crash l'app.
+  - Il service worker non mescola più due versioni.
+  - Le missioni non si completano più da sole aprendo il laboratorio o con gli esempi pronti.
+  - La streak regge il cambio dell'ora legale.
+  - Altri casi di navigazione corretti.

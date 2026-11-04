@@ -489,3 +489,9 @@ section, .q, .fl, .opts, .three, .qa, .flinks, .dl, .review-list, .feedback, .ex
 .im.im-wide { display: block; max-width: 100%; overflow-x: auto; overflow-y: hidden; padding: 3px 0; }
 .exam ol, .steps, .notes, .missions, .tree, .plist, .bars, .settings, .today, .labbox, .controls, .lab-group, .intro { grid-template-columns: minmax(0, 1fr); }
 .mission { grid-template-columns: 26px minmax(0, 1fr); }
+.labrow .mpips { flex-wrap: wrap; justify-content: flex-end; max-width: 100px; }
+/* il testo MathML nascosto di KaTeX (per i lettori di schermo) non deve sporgere a fine riga */
+.im, .math { position: relative; }
+.katex .katex-mathml { left: 0; top: 0; }
+/* rete di sicurezza: la pagina non scorre mai di lato (clip non rompe l'intestazione sticky) */
+body { overflow-x: clip; }
